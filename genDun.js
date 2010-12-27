@@ -110,9 +110,10 @@ function generateDungeon() {
 	for (var i = 4; i >= 0; i--) {
 		for (var j = Math.pow(2, i); j <= Math.pow(2, i+1)-1; j += 2) connect(tree[j], tree[j+1]);
 	}
-	
-	for (var i = 18; i <= 32; i++) {
-		for (var j = 18; j <= 32; j++) {
+	player.x = Math.floor((tree[24].startX + tree[24].endX) / 2);
+	player.y = Math.floor((tree[24].startY + tree[24].endY) / 2);
+	for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) {
+		for (var j = (player.y-7 < 1 ? 1 : player.y-7); j <= (player.y+7 > 50 ? 50 : player.y+7); j++) {
 			dun[i][j].known = true;
 		}
 	}
