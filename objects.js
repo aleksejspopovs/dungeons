@@ -18,7 +18,6 @@ function monster(id, type, mX, mY, dir) {
 	this.attack = monsterTypes[type].attack;
 	this.defence = monsterTypes[type].defence;
 	this.name = monsterTypes[type].name;
-	dungeon[mX][mY].monster = id;
 	this.moveTo = function (dir, i, limit) {
 		var xOff = new Array(0, 0, 1, 0, -1);
 		var yOff = new Array(0, -1, 0, 1, 0);

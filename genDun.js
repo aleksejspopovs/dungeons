@@ -78,7 +78,7 @@ function generateDungeon() {
 			dun[w.x][w.y].tile = 1;
 			dun[w.x][w.y].pass = true;
 		}
-	}		
+	}	
 	var tree = new Array();
 	tree[1] = new treeGrid(1, 1, 50, 50);
 	
@@ -115,6 +115,14 @@ function generateDungeon() {
 	for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) {
 		for (var j = (player.y-7 < 1 ? 1 : player.y-7); j <= (player.y+7 > 50 ? 50 : player.y+7); j++) {
 			dun[i][j].known = true;
+		}
+	}
+	j = 1;
+	for (var i = rand(16,18); i <= 31; i += rand(1,3)) {
+		if (i != 24) {
+			monsters[j] = new monster(j, 1, Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
+			dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster = j;
+			j++;
 		}
 	}
 	return dun;
