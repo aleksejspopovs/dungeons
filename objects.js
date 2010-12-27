@@ -6,6 +6,7 @@ function dungeonTile(tile, passable, monster) {
   this.tile = tile;
   this.pass = passable;
   this.monster = monster;
+  this.known = false;
 }
 function monster(id, type, mX, mY, dir) {
 	this.id = id;

@@ -111,6 +111,10 @@ function generateDungeon() {
 		for (var j = Math.pow(2, i); j <= Math.pow(2, i+1)-1; j += 2) connect(tree[j], tree[j+1]);
 	}
 	
-	
+	for (var i = 18; i <= 32; i++) {
+		for (var j = 18; j <= 32; j++) {
+			dun[i][j].known = true;
+		}
+	}
 	return dun;
 }
