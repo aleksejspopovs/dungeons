@@ -1,0 +1,9 @@
+<html>
+<head>
+<title>messing with canvas</title>
+</head>
+<body>
+<canvas id='game' width='640' height='480'>you should have a decent browser (like Firefox 3.5+, or Google Chrome 2.0+) to use this awesome technical demo</canvas><br />
+<i></i>
+</body>
+</html>
