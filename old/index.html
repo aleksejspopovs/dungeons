@@ -1,28 +1,79 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>&lt;insert game name here&gt;</title>
-<script src="objects.js" type="text/javascript" charset="utf-8"></script>
-<script src="genDun.js" type="text/javascript" charset="utf-8"></script>
+<title>messing with canvas</title>
 <script>
-// main roguelike code
-// 2010 no copyright — mariofag
-// free software is our future
-loaded = 0;
+/*
+TODO:
+* HP recovering
+* battle system
+* items
+* FUN!
+*/
 
-temp = 1;
-intervalId = 0;
+function dungeonTile(tile, passable, monster) {
+  this.tile = tile;
+  this.pass = passable;
+  this.monster = monster;
+}
+function monster(id, type, mX, mY, dir) {
+	this.type = type;
+	this.x = mX;
+	this.y = mY;
+	this.dir = dir;
+	this.hp = monsterTypes[type].hp;
+	this.attack = monsterTypes[type].attack;
+	this.defence = monsterTypes[type].defence;
+	this.name = monsterTypes[type].name;
+	dungeon[mX][mY].monster = id;
+}
+function monsterType(tile, name, desc, hp, attack, defence) {
+	this.tile = tile;
+	this.name = name;
+	this.desc = desc;
+	this.hp = hp;
+	this.attack = attack;
+	this.defence = defence;
+}
+function player(name, image, x, y, dir, hp, maxhp, attack, defence) {
+	this.name = name;
+	this.image = image;
+	this.x = x;
+	this.y = y;
+	this.dir = dir;
+	this.hp = hp;
+	this.maxHp = maxhp;
+	this.attack = attack;
+	this.defence = defence;
+}
 
 player = new player("Anonymous", "bag", 24, 24, 3, 100, 100, 30, 15);
 
-dungeon = generateDungeon();
+document.onkeydown = move;
+dungeon = new Array();
+for (var i=1; i <= 50; i++) {
+  dungeon[i] = new Array();
+  for (var j=1; j <= 50; j++) {
+    dungeon[i][j] = new dungeonTile((i == 1 || i == 50 || j == 1 || j == 50) ? 2 : 1, (i == 1 || i == 50 || j == 1 || j == 50) ? false : true, 0);
+  }
+}
+dungeon[25][25].tile = 2;
+dungeon[25][25].pass = false;
 
 monsterTypes = new Array();
 monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 10, 20, 20);
 monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always choses to GTFO.", 10, 20, 20);
 
-mapTiles = new Array();
 monsters = new Array();
+monsters[1] = new monster(1, 1, 5, 5, 4);
+monsters[2] = new monster(2, 2, 4, 6, 3);
+monsters[3] = new monster(3, 1, 5, 7, 1);
+mapTiles = new Array();
+loaded = 0;
+
+temp = 1;
+intervalId = 0;
+
 
 function log(str) {
 	document.getElementById('gamelog').value += str+"\n";
@@ -32,16 +83,11 @@ function log(str) {
 function imgLoad() {
 	loaded++;
 	if (loaded >= 15) {
-		setTimeout(function() {
-			draw(); 
-			document.onkeydown = turn;
-			log(player.name+" has entered the dungeon.");
-		}, 125);
+		setTimeout(function() {draw(); log(player.name+" has entered the dungeon.");}, 125);
 	}
 }
 
 function init() {
-	temp = 1;
 	document.getElementById('gamelog').value = "";
 	canvas = document.getElementById('game');
 	if (canvas.getContext){
@@ -107,6 +153,7 @@ function draw() {
 	for (var i = Math.round(player.x)-10; i < 21+(Math.round(player.x)-10); i++) {
 		for (var j = Math.round(player.y)-7; j < 15+(Math.round(player.y)-7); j++) {
 			ctx.drawImage((dungeon[i] != undefined && dungeon[i][j] != undefined) ? tTerrains[dungeon[i][j].tile] : tTerrains[0], (i-player.x+10)*32, (j-player.y+7)*32);
+			//console.log(i+' '+j);
 			if (dungeon[i] != undefined && dungeon[i][j] != undefined && dungeon[i][j].monster) ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-player.x+10)*32, (j-player.y+7)*32);
 		}
 	}
@@ -128,7 +175,6 @@ function draw() {
 	ctx.fillText(player.hp+"/"+player.maxHp+" HP", 682, 52);
 	ctx.fillText("ATT: "+player.attack, 682, 72);
 	ctx.fillText("DEF: "+player.defence, 682, 82);
-	ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 92);
 	
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
@@ -160,6 +206,17 @@ function gameOver(c) {
 	}
 }
 
+function dead(creature) {
+	if (creature.image != undefined) {
+		player.hp = 0;
+		log("You're dead, GAME OVER");
+		gameOver(false);
+	} else {
+		dungeon[creature.x][creature.y].monster = 0;
+		draw();
+	}
+}
+
 function attack(att, def) {
 	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
 	switch (att.dir) {
@@ -187,11 +244,32 @@ function attack(att, def) {
 	}
 	if (def.hp < 1) {
 		log(def.name+' died.');
-		def.dead();
+		dead(def);
 	}
 }
 
-function turn(event) {
+function AITurns() {
+	for (var i = 1; i < monsters.length; i++) {
+		if (monsters[i].hp < 1 || player.hp < 1) continue;
+		if (Math.abs(monsters[i].x - player.x) + Math.abs(monsters[i].y - player.y) == 1) {
+			attack(monsters[i], player);
+		}/* else {
+			if ((((monsters[i].x - 7) <= player.x) && ((monsters[i].x + 7) >= player.x)) && (((monsters[i].y - 7) <= player.y) && ((monsters[i].y + 7) >= player.y))) {
+				if (player.x > monsters[i].x) {
+					if (player.y >= monsters[i].y) monsters[i].move(3);	
+					else monsters[i].move()
+
+				} else {
+					if (player.y >= monsters[i].y) {
+						
+					}					
+				}
+			}
+		}*/
+	}
+}
+
+function move(event) {
   var nX = player.x;
   var nY = player.y;
 	switch (event.keyCode)
@@ -217,23 +295,16 @@ function turn(event) {
 		default:
 			nX = -1;
 		break;
-	}
-	
+	} 
   if (nX != -1 && !event.shiftKey && dungeon[nX][nY].pass) {
 		if (dungeon[nX][nY].monster) {
 			attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
 		} else {
 		  player.x = nX;
 		  player.y = nY;
-		  
-		  player.hp += Math.round(Math.random()*3);
-			if (player.hp > player.maxHp) player.hp = player.maxHp;
+			// TODO : HP recover here!
 		}
-		
-		for (var i = 1; i < monsters.length; i++) {
-			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster not dead, make him take his turn
-		}	// AI players take their turns
-		
+		AITurns();        // in any of the above cases, AI takes its turn anyway
 		draw();
 	} else draw();      // player  pressed the wrong key, only wanted to change the direction or bumped in a wall
 }
@@ -247,10 +318,7 @@ function turn(event) {
 	font-family: Visitor;
 	src: url('misc/visitor.ttf');
 }
-#title {
-	font-family: Pixelated;
-	font-size: 40px;
-}
+
 #gamelog {
   background-color: white;
   color: black;
@@ -261,10 +329,9 @@ function turn(event) {
 </style>
 </head>
 <body onLoad='init();'>
-<img src='images/logo.png'> <span id='title'>&lt;insert game name here&gt;</span><br /><br />
 <canvas id='game' width='822' height='480' style='border-style: solid; border-width: 1px;'>you should have a decent browser (like Firefox 3.5+, or Google Chrome 2.0+) to use this awesome technical demo</canvas><br />
 <textarea disabled="disabled" id="gamelog" cols="100" rows="10"></textarea><br />
-<input type='button' value='что это, черт возьми, такое?' style='font-family: Pixelated;' onClick='alert("Это — игра в жанре dungeon-crawling roguelike. Пишет её ленивый кодер под ником mariofag в своё свободное время. Арты либо краденные, либо нарисованные няшкой Endou. Пока-что игра находится на зачаточной стадии и в ней реализован лишь базовый функционал. Управление стрелками, что бы повернуться (не совершая ход), надо зажать Shift. Больше информации и связь с разработчиком — в jabber-конференции iichanvg@conference.jabber.ru")' />
+<input type='button' value='что это, черт возьми, такое?' onClick='alert("Это — игра в жанре dungeon-crawling roguelike. Пишет её ленивый кодер под ником mariofag в своё свободное время. Арты либо краденные, либо нарисованные няшкой Endou. Пока-что игра находится на зачаточной стадии и в ней реализован лишь базовый функционал. Управление стрелками, что бы повернуться (не совершая ход), надо зажать Shift. Больше информации и связь с разработчиком — в jabber-конференции iichanvg@conference.jabber.ru")' />
 <div style='font-family: Visitor; font-size: 10px'>game by mariofag</div>
 </body>
 </html>
