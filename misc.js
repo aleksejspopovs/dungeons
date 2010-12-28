@@ -45,3 +45,54 @@ function rand(a,b) {
 	}
 	return Math.round(Math.random()*(b-a))+parseInt(a);
 }
+
+function pathFinding(tX, tY, fX, fY) {
+	var xOff = new Array(0, 0, 1, 0, -1);
+	var yOff = new Array(0, -1, 0, 1, 0);
+	var queue = new Array();
+	var dung = new Array();
+	for (var i = 1; i <= 50; i++) {
+		dung[i] = new Array();
+		for (var j = 1; j <= 50; j++) dung[i][j] = Infinity;
+	}
+	var curX = fX;
+	var curY = tY;
+	var r = 1;
+	var w = 2;
+	dung[fX][fY] = 0;
+	queue[1] = fX*100+fY;
+	while (!((curX == tX) && (curY == tY)) && !(r == w)) {
+		curX = Math.floor(queue[r]/100);
+		curY = queue[r] % 100;
+		if (curX < 50 && dungeon[curX+1][curY].pass && dung[curX+1][curY] > dung[curX][curY]+1) {
+			dung[curX+1][curY] = dung[curX][curY]+1;
+			queue[w] = (curX+1)*100 + curY;
+			w++;
+		}
+		if (curX > 1 && dungeon[curX-1][curY].pass && dung[curX-1][curY] > dung[curX][curY]+1) {
+			dung[curX-1][curY] = dung[curX][curY]+1;
+			queue[w] = (curX-1)*100 + curY;
+			w++;
+		}
+		if (curY < 50 && dungeon[curX][curY+1].pass && dung[curX][curY+1] > dung[curX][curY]+1) {
+			dung[curX][curY+1] = dung[curX][curY]+1;
+			queue[w] = curX*100 + curY+1;
+			w++;
+		}
+		if (curY > 1 && dungeon[curX][curY-1].pass && dung[curX][curY-1] > dung[curX][curY]+1) {
+			dung[curX][curY-1] = dung[curX][curY]+1;
+			queue[w] = curX*100 + curY-1;
+			w++;
+		}
+		r++;
+	}
+	var minDir = 0;
+	var minVal = Infinity;
+	for (i = 1; i <= 4; i++) {
+		if (dung[tX+xOff[i]][tY+yOff[i]] < minVal) {
+			minVal = dung[tX+xOff[i]][tY+yOff[i]];
+			minDir = i;
+		}	
+	}
+	return minDir;
+}
