@@ -110,8 +110,8 @@ function draw() {
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
-				//mapTiles[dungeon[i][j].known ? (dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)) : 3],
-				mapTiles[dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)],
+				mapTiles[dungeon[i][j].known ? (dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)) : 3],
+				//mapTiles[dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
