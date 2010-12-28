@@ -36,12 +36,12 @@ function monster(id, type, mX, mY, dir) {
 			attack(this, player); // if player is near, attack him
 		} else {
 			if ((((this.x - 9) <= player.x) && ((this.x + 9) >= player.x)) && (((this.y - 9) <= player.y) && ((this.y + 9) >= player.y))) { // if can see player, go in his direction
-				this.moveTo(player.x == this.x ? (player.y > this.y ? 3 : 1) : (player.x > this.x ? 2 : 4), 1, 4);
-				draw();
+				//this.moveTo(player.x == this.x ? (player.y > this.y ? 3 : 1) : (player.x > this.x ? 2 : 4), 1, 4);
+				this.moveTo(pathFinding(this.x, this.y, player.x, player.y), 1, 4)
 			} else  { // else go randomly
-				this.moveTo(Math.round(Math.random()*3)+1, 1, 4);
-				draw();
-			}
+				this.moveTo(rand(1,4), 1, 4);
+			}				
+			draw();
 		}
 	}
 	this.dead = function () {
