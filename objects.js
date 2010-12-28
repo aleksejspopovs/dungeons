@@ -72,11 +72,3 @@ function player(name, image, x, y, dir, hp, maxhp, attack, defence) {
 		gameOver(false);
 	}
 }
-function rand(a,b) {
-	if (a > b) {
-		x = a;
-		a = b;
-		b = a;
-	}
-	return Math.round(Math.random()*(b-a))+parseInt(a);
-}
