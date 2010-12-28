@@ -1,22 +1,28 @@
 // main roguelike logic
 // 2010 no copyright — mariofag
 // free software is our future
+var dungeon;
+var temp;
+var loaded = 0;
+var intervalId = 0;
+
+monsterTypes = new Array();
+monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 10, 20, 20);
+monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always choses to GTFO.", 10, 20, 20);
+player = new playerO("Anonymous", "bag", 25, 25, 3, 100, 100, 30, 15)
+monsters = new Array();
+mapTiles = new Array();
 
 function imgLoad() {
 	loaded++;
 	if (loaded >= 15) {
-		setTimeout(function() {
-			draw(); 
-			document.onkeydown = turn;
-			log(player.name+" has entered the dungeon.");
-		}, 125);
+		setTimeout(newGame, 125);
 	}
 }
 
 function init() {
 	if (!window.localStorage.rows) window.localStorage.rows = 10;
   document.getElementById('gamelog').rows = window.localStorage.rows;
-	temp = 1;
 	document.getElementById('gamelog').value = "";
 	canvas = document.getElementById('game');
 	if (canvas.getContext){
@@ -78,6 +84,15 @@ function init() {
 	} else {
 		alert('you are a baka and youre using an outdated browser');
 	}
+}
+
+function newGame() {
+	player = new playerO("Anonymous", "bag", 25, 25, 3, 100, 100, 30, 15);
+	dungeon = generateDungeon();
+	temp = 1;
+	draw(); 
+	document.onkeydown = turn;
+	log(player.name+" has entered the dungeon.");	
 }
 
 function draw() {

@@ -56,7 +56,7 @@ function monsterType(tile, name, desc, hp, attack, defence) {
 	this.attack = attack;
 	this.defence = defence;
 }
-function player(name, image, x, y, dir, hp, maxhp, attack, defence) {
+function playerO(name, image, x, y, dir, hp, maxhp, attack, defence) {
 	this.name = name;
 	this.image = image;
 	this.x = x;

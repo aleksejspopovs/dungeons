@@ -120,7 +120,7 @@ function generateDungeon() {
 	j = 1;
 	for (var i = rand(16,18); i <= 31; i += rand(1,3)) {
 		if (i != 24) {
-			monsters[j] = new monster(j, 1, Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
+			monsters[j] = new monster(j, rand(1, monsterTypes.length-1), Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
 			dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster = j;
 			j++;
 		}
