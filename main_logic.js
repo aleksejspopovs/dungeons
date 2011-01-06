@@ -6,10 +6,12 @@ var temp;
 var loaded = 0;
 var intervalId = 0;
 
+var LEVELMOD = 6;
+
 monsterTypes = new Array();
-monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 10, 20, 20);
-monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always choses to GTFO.", 10, 20, 20);
-player = new playerO("Anonymous", "bag", 25, 25, 3, 100, 100, 30, 15)
+monsterTypes[1] = new monsterType("troll", 		"Troll", 			"A normal, fat and green troll.", 2, 3);
+monsterTypes[2] = new monsterType("trolltan", "Troll-tan",	"She always choses to GTFO.", 		1, 2);
+player = new playerO("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
 mapTiles = new Array();
 
@@ -109,24 +111,29 @@ function draw() {
 
 	ctx.fillStyle = 'white';
 	ctx.font = "16px Pixelated";
-	ctx.fillText(player.name, 682, 20);
+	ctx.fillText(player.name, 682, 18);
 	
-	ctx.strokeRect(682, 40, 130, 3);
+	ctx.strokeRect(682, 35, 130, 3);
 	ctx.fillStyle = 'green';
-	ctx.fillRect(682, 40, (player.hp / player.maxHp)*130, 3);
+	ctx.fillRect(682, 35, (player.hp / player.maxHp)*130, 3);
+
+	ctx.strokeRect(682, 55, 130, 3);
+	ctx.fillStyle = '#FFA000';
+	ctx.fillRect(682, 55, (player.xp / ((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD))*130, 3);
 
 	ctx.fillStyle = 'white';
 	ctx.font = "10px Visitor";
-	ctx.fillText(player.hp+"/"+player.maxHp+" HP", 682, 52);
-	ctx.fillText("ATT: "+player.attack, 682, 72);
-	ctx.fillText("DEF: "+player.defence, 682, 82);
-	ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 92);
+	ctx.fillText("level "+player.lvl, 682, 26);
+	ctx.fillText(player.hp+"/"+player.maxHp+" HP", 682, 47);
+	ctx.fillText(player.xp+"/"+((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD)+" XP", 682, 67);
+	ctx.fillText("ATT: "+player.attack, 682, 78);
+	ctx.fillText("DEF: "+player.defence, 747, 78);
+	ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 105);
 	
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
 				mapTiles[dungeon[i][j].known ? (dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)) : 3],
-				//mapTiles[dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
@@ -153,11 +160,11 @@ function attack(att, def) {
 		break;
 	} 
 	draw();
-	var success = Math.random() - (def.defence/10 * Math.random());
-	if (success > 0.1) {   
-		var damage = Math.round(success * att.attack);
+	var success = att.attack > def.defence ? 1 : Math.random() - ((def.defence - att.attack) * Math.random());
+	if (success > 0.2) {   
+	var damage = Math.round(Math.abs(Math.random() * 2 * att.attack));
 		def.hp -= damage;
-		log(att.name+' has attacked '+def.name+', and made '+damage+' points of damage.');
+		log(att.name+' has attacked '+def.name+' and made '+damage+' points of damage.');
 	} else {
 		log(att.name+' has tried to attack '+def.name+', but missed!');
 	}
@@ -174,18 +181,22 @@ function turn(event) {
 	{
 		case 0x25:
 			player.dir = 4;
+			event.preventDefault();
 			nX--;
 		break;
 		case 0x26:
 			player.dir = 1;
+			event.preventDefault();
 			nY--;
 		break;
 		case 0x27:
 		  player.dir = 2;
+		  event.preventDefault();
 			nX++;
 		break;
 		case 0x28:
 			player.dir = 3;
+			event.preventDefault();
 			nY++;
 		break;
 		case 0x0D:
@@ -202,8 +213,8 @@ function turn(event) {
 		  player.x = nX;
 		  player.y = nY;
 		  
-		  /*player.hp += rand(0,2);
-			if (player.hp > player.maxHp) player.hp = player.maxHp;*/
+		  player.hp += rand(0,1);
+			if (player.hp > player.maxHp) player.hp = player.maxHp;
 			
 			if (player.dir % 2 == 0) { // left or right
 				if ((player.x + (player.dir == 4 ? -10 : 10) <= 50) && (player.x + (player.dir == 4 ? -10 : 10) >= 1)) {

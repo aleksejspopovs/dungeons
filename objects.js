@@ -8,15 +8,16 @@ function dungeonTile(tile, passable, monster) {
   this.monster = monster;
   this.known = false;
 }
-function monster(id, type, mX, mY, dir) {
+function monster(id, type, lvl, mX, mY, dir) {
 	this.id = id;
 	this.type = type;
+	this.lvl = lvl;
 	this.x = mX;
 	this.y = mY;
 	this.dir = dir;
-	this.hp = monsterTypes[type].hp;
-	this.attack = monsterTypes[type].attack;
-	this.defence = monsterTypes[type].defence;
+	this.hp = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin*3, monsterTypes[type].modMin*3);
+	this.attack = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
+	this.defence = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
 	this.name = monsterTypes[type].name;
 	this.moveTo = function (dir, i, limit) {
 		var xOff = new Array(0, 0, 1, 0, -1);
@@ -46,26 +47,35 @@ function monster(id, type, mX, mY, dir) {
 	}
 	this.dead = function () {
 		dungeon[this.x][this.y].monster = 0;
+		player.xp += (player.lvl - this.lvl + 2) * rand(monsterTypes[this.type].modMin, monsterTypes[this.type].modMax);	
+		if (player.xp >= ((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD)) {
+			player.lvl++;
+			log(player.name+" has leveled up! His level is now "+player.lvl+".");
+			player.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
+			player.attack = Math.round(Math.random()*3+5) * player.lvl;
+			player.defence = Math.round(Math.random()*3+5) * player.lvl;
+		}
 	}
 }
-function monsterType(tile, name, desc, hp, attack, defence) {
+function monsterType(tile, name, desc, modMin, modMax) {
 	this.tile = tile;
 	this.name = name;
 	this.desc = desc;
-	this.hp = hp;
-	this.attack = attack;
-	this.defence = defence;
+	this.modMin = modMin;
+	this.modMax = modMax;
 }
-function playerO(name, image, x, y, dir, hp, maxhp, attack, defence) {
+function playerO(name, image, x, y, dir) {
 	this.name = name;
 	this.image = image;
 	this.x = x;
 	this.y = y;
 	this.dir = dir;
-	this.hp = hp;
-	this.maxHp = maxhp;
-	this.attack = attack;
-	this.defence = defence;
+	this.xp = 0;
+	this.lvl = 1;
+	this.maxHp = 50;
+	this.hp = this.maxHp;
+	this.attack = Math.round(Math.random()*3+5);
+	this.defence = Math.round(Math.random()*3+5);
 	this.dead = function () {
 		player.hp = 0;
 		log("You're dead, GAME OVER");
