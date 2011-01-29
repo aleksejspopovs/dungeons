@@ -9,8 +9,8 @@ var intervalId = 0;
 var LEVELMOD = 6;
 
 monsterTypes = new Array();
-monsterTypes[1] = new monsterType("troll", 		"Troll", 			"A normal, fat and green troll.", 2, 3);
-monsterTypes[2] = new monsterType("trolltan", "Troll-tan",	"She always choses to GTFO.", 		1, 2);
+monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 2, 3);
+monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always choses to GTFO.", 1, 2);
 player = new playerO("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
 mapTiles = new Array();
@@ -23,8 +23,10 @@ function imgLoad() {
 }
 
 function init() {
-	if (!window.localStorage.rows) window.localStorage.rows = 10;
-  document.getElementById('gamelog').rows = window.localStorage.rows;
+	if (window.localStorage != undefined) {
+		if (!window.localStorage.rows) window.localStorage.rows = 10;
+		document.getElementById('gamelog').rows = window.localStorage.rows;
+	}
 	document.getElementById('gamelog').value = "";
 	canvas = document.getElementById('game');
 	if (canvas.getContext){
@@ -43,7 +45,7 @@ function init() {
 		tTerrains[2].onload = imgLoad;
 
 		
-		tPlayer = new Array();    // Player
+		tPlayer = new Array(); // Player
 		tPlayer[1] = new Image(); // Player facing up
 		tPlayer[1].src = './images/'+player.image+'/up.png';
 		tPlayer[1].onload = imgLoad;
@@ -55,20 +57,20 @@ function init() {
 		tPlayer[3].onload = imgLoad;
 		tPlayer[4] = new Image(); // Player facing left
 		tPlayer[4].src = './images/'+player.image+'/left.png';
-		tPlayer[4].onload = imgLoad;	
+		tPlayer[4].onload = imgLoad;
 		
 		tMonsters = new Array();
 		for (var i = 1; i < monsterTypes.length; i++) {
 			tMonsters[i] = new Array();
 			tMonsters[i][1] = new Image();
 			tMonsters[i][1].src = './images/monsters/'+monsterTypes[i].tile+'_up.png'; 
-			tMonsters[i][1].onload = imgLoad;		
+			tMonsters[i][1].onload = imgLoad;
 			tMonsters[i][2] = new Image();
 			tMonsters[i][2].src = './images/monsters/'+monsterTypes[i].tile+'_right.png';
-			tMonsters[i][2].onload = imgLoad;		
+			tMonsters[i][2].onload = imgLoad;
 			tMonsters[i][3] = new Image();
 			tMonsters[i][3].src = './images/monsters/'+monsterTypes[i].tile+'_down.png';
-			tMonsters[i][3].onload = imgLoad;		
+			tMonsters[i][3].onload = imgLoad;
 			tMonsters[i][4] = new Image();
 			tMonsters[i][4].src = './images/monsters/'+monsterTypes[i].tile+'_left.png';
 			tMonsters[i][4].onload = imgLoad;
@@ -78,8 +80,8 @@ function init() {
 		mapTiles[2] = ctx.createImageData(3,3); // wall
 		for (var i = 0; i <= 35; i++) mapTiles[2].data[i] = !((i+1) % 4) ? 255 : 0;
 		mapTiles[3] = ctx.createImageData(3,3); // undefined
-		for (var i = 0; i <= 35; i++) mapTiles[3].data[i] = (i+1)%4 ? 228 : 255;	
-		mapTiles[4] = ctx.createImageData(3,3); // player
+		for (var i = 0; i <= 35; i++) mapTiles[3].data[i] = (i+1)%4 ? 228 : 255;
+			mapTiles[4] = ctx.createImageData(3,3); // player
 		for (var i = 0; i <= 35; i++) mapTiles[4].data[i] = i % 2 ? 255 : 0;
 		mapTiles[5] = ctx.createImageData(3,3); // monster
 		for (var i = 0; i <= 35; i++) mapTiles[5].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;
@@ -93,8 +95,11 @@ function newGame() {
 	dungeon = generateDungeon();
 	temp = 1;
 	draw(); 
-	document.onkeydown = turn;
-	log(player.name+" has entered the dungeon.");	
+	if (navigator.appName == "Opera")
+		document.onkeypress = turn;
+	else 
+		document.onkeydown = turn;
+	log(player.name+" has entered the dungeon.");
 }
 
 function draw() {
@@ -161,7 +166,7 @@ function attack(att, def) {
 	} 
 	draw();
 	var success = att.attack > def.defence ? 1 : Math.random() - ((def.defence - att.attack) * Math.random());
-	if (success > 0.2) {   
+	if (success > 0.2) {
 	var damage = Math.round(Math.abs(Math.random() * 2 * att.attack));
 		def.hp -= damage;
 		log(att.name+' has attacked '+def.name+' and made '+damage+' points of damage.');
@@ -175,8 +180,8 @@ function attack(att, def) {
 }
 
 function turn(event) {
-  var nX = player.x;
-  var nY = player.y;
+	var nX = player.x;
+	var nY = player.y;
 	switch (event.keyCode)
 	{
 		case 0x25:
@@ -190,8 +195,8 @@ function turn(event) {
 			nY--;
 		break;
 		case 0x27:
-		  player.dir = 2;
-		  event.preventDefault();
+			player.dir = 2;
+			event.preventDefault();
 			nX++;
 		break;
 		case 0x28:
@@ -205,15 +210,15 @@ function turn(event) {
 			nX = -1;
 		break;
 	}
-	
-  if (nX != -1 && !event.shiftKey && dungeon[nX][nY].pass) {
+
+	if (nX != -1 && !event.shiftKey && dungeon[nX][nY].pass) {
 		if (dungeon[nX][nY].monster) {
 			attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
 		} else {
-		  player.x = nX;
-		  player.y = nY;
-		  
-		  player.hp += rand(0,1);
+			player.x = nX;
+			player.y = nY;
+			
+			player.hp += rand(0,1);
 			if (player.hp > player.maxHp) player.hp = player.maxHp;
 			
 			if (player.dir % 2 == 0) { // left or right
@@ -226,11 +231,11 @@ function turn(event) {
 				}
 			}
 		}
-		
+
 		for (var i = 1; i < monsters.length; i++) {
 			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster not dead, make him take his turn
 		}	// AI players take their turns
 		
 		draw();
-	} else draw();      // player  pressed the wrong key, only wanted to change the direction or bumped in a wall
+	} else draw(); // player pressed the wrong key, only wanted to change the direction or bumped in a wall
 }

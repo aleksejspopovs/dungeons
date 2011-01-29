@@ -3,6 +3,10 @@
 // free software is our future
 
 
+function gameOverKeyHandler(e) {
+	if (e.keyCode == 1090 || e.keyCode == 110) newGame();
+}
+
 function log(str) {
 	document.getElementById('gamelog').value += str+"\n";
 	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; 
@@ -17,7 +21,7 @@ function log_inc() {
 }
 
 function fillScreenPart() {
-	ctx.fillStyle = 'black';  
+	ctx.fillStyle = 'black';
 	ctx.fillRect(0, 0, 672, 10*temp);
 	temp++;
 	if (temp > 48) {
@@ -27,13 +31,18 @@ function fillScreenPart() {
 }
 
 function gameOver(c) {
-	if (!c)	{
-		document.onkeydown = "";
+	if (!c) {
+		if (navigator.appName == "Opera")
+			document.onkeypress = gameOverKeyHandler;
+		else 
+			document.onkeydown = gameOverKeyHandler;
 		intervalId = setInterval(fillScreenPart, 125);
 	} else {
-		ctx.fillStyle = 'white';  
-		ctx.font = "72px Pixelated";
+		ctx.fillStyle = 'white';
+		ctx.font = "54pt Pixelated";
 		ctx.fillText("GAME OVER", 147, 80);
+		ctx.font = "12pt Pixelated";
+		ctx.fillText("Press n to start a new game", 200, 100);
 	}
 }
 

@@ -85,16 +85,16 @@ function generateDungeon() {
 				tree[Math.floor(i/2)].startY,
 				tree[Math.floor(i/2)].endX,
 				Math.floor(tree[Math.floor(i/2)].startY + ((tree[Math.floor(i/2)].endY - tree[Math.floor(i/2)].startY + 1)* (rand(45,55)/100))));
-			tree[i+1] = new treeGrid(tree[i].startX, tree[i].endY, tree[Math.floor(i/2)].endX, tree[Math.floor(i/2)].endY);				
+			tree[i+1] = new treeGrid(tree[i].startX, tree[i].endY, tree[Math.floor(i/2)].endX, tree[Math.floor(i/2)].endY);
 		}
 	}
 	
 	var dun = new Array();
 	for (var i=0; i <= 51; i++) {
-	  dun[i] = new Array();
-	  for (var j=0; j <= 51; j++) {
-	    dun[i][j] = new dungeonTile(2, false, 0);
-	  }
+		dun[i] = new Array();
+		for (var j=0; j <= 51; j++) {
+			dun[i][j] = new dungeonTile(2, false, 0);
+		}
 	}	
 	
 	for (var i = 16; i <= 31; i++) diffFill(tree[i]);
