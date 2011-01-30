@@ -6,7 +6,15 @@ var temp;
 var loaded = 0;
 var intervalId = 0;
 
-var LEVELMOD = 6;
+/* CONST */
+const LEVELMOD = 6;
+const TILESIZE = 32;
+
+const MT_FLOOR = 1;
+const MT_WALL = 2;
+const MT_UNDEF = 3;
+const MT_PLAYER = 4;
+const MT_MONSTER = 5;
 
 monsterTypes = new Array();
 monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 2, 3);
@@ -18,6 +26,7 @@ mapTiles = new Array();
 function imgLoad() {
 	loaded++;
 	if (loaded >= 15) {
+		document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
 		setTimeout(newGame, 125);
 	}
 }
@@ -75,16 +84,16 @@ function init() {
 			tMonsters[i][4].src = './images/monsters/'+monsterTypes[i].tile+'_left.png';
 			tMonsters[i][4].onload = imgLoad;
 		}
-		mapTiles[1] = ctx.createImageData(3,3); // floor
-		for (var i = 0; i <= 35; i++) mapTiles[1].data[i] = 255;
-		mapTiles[2] = ctx.createImageData(3,3); // wall
-		for (var i = 0; i <= 35; i++) mapTiles[2].data[i] = !((i+1) % 4) ? 255 : 0;
-		mapTiles[3] = ctx.createImageData(3,3); // undefined
-		for (var i = 0; i <= 35; i++) mapTiles[3].data[i] = (i+1)%4 ? 228 : 255;
-			mapTiles[4] = ctx.createImageData(3,3); // player
-		for (var i = 0; i <= 35; i++) mapTiles[4].data[i] = i % 2 ? 255 : 0;
-		mapTiles[5] = ctx.createImageData(3,3); // monster
-		for (var i = 0; i <= 35; i++) mapTiles[5].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;
+		mapTiles[MT_FLOOR] = ctx.createImageData(3,3); // floor
+		for (var i = 0; i <= 35; i++) mapTiles[MT_FLOOR].data[i] = 255;
+		mapTiles[MT_WALL] = ctx.createImageData(3,3); // wall
+		for (var i = 0; i <= 35; i++) mapTiles[MT_WALL].data[i] = !((i+1) % 4) ? 255 : 0;
+		mapTiles[MT_UNDEF] = ctx.createImageData(3,3); // undefined
+		for (var i = 0; i <= 35; i++) mapTiles[MT_UNDEF].data[i] = (i+1)%4 ? 228 : 255;
+		mapTiles[MT_PLAYER] = ctx.createImageData(3,3); // player
+		for (var i = 0; i <= 35; i++) mapTiles[MT_PLAYER].data[i] = i % 2 ? 255 : 0;
+		mapTiles[MT_MONSTER] = ctx.createImageData(3,3); // monster
+		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;
 	} else {
 		alert('you are a baka and youre using an outdated browser');
 	}
@@ -103,13 +112,21 @@ function newGame() {
 }
 
 function draw() {
-	for (var i = Math.round(player.x)-10; i < 21+(Math.round(player.x)-10); i++) {
-		for (var j = Math.round(player.y)-7; j < 15+(Math.round(player.y)-7); j++) {
-			ctx.drawImage((dungeon[i] != undefined && dungeon[i][j] != undefined) ? tTerrains[dungeon[i][j].tile] : tTerrains[0], (i-player.x+10)*32, (j-player.y+7)*32);
-			if (dungeon[i] != undefined && dungeon[i][j] != undefined && dungeon[i][j].monster) ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-player.x+10)*32, (j-player.y+7)*32);
+	for (var i = player.x-10; i < player.x+11; i++) {
+		for (var j = player.y-7; j < player.y+8; j++) {
+			ctx.drawImage((dungeon[i] != undefined && dungeon[i][j] != undefined) ? tTerrains[dungeon[i][j].tile] : tTerrains[0], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
+			if (dungeon[i] != undefined && dungeon[i][j] != undefined && dungeon[i][j].monster) ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
 		}
 	}
-	ctx.drawImage(tPlayer[player.dir], 10*32, 7*32);
+	ctx.drawImage(tPlayer[player.dir], 10*TILESIZE, 7*TILESIZE);
+
+	if (rand(0,3) == 1) {
+		var grid = ctx.getImageData(0, 0, TILESIZE*21, TILESIZE*15);
+		for (var i = 0; i < grid.data.length; i++) {
+			if ((i+1) % 4 != 0) grid.data[i] = 255 - grid.data[i];
+		}
+		ctx.putImageData(grid, 0, 0);
+	}
 
 	ctx.fillStyle = 'gray';
 	ctx.fillRect(672, 0, 822, 480);
@@ -138,13 +155,13 @@ function draw() {
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
-				mapTiles[dungeon[i][j].known ? (dungeon[i][j].monster ? 5 : (dungeon[i][j].pass ? 1 : 2)) : 3],
+				mapTiles[dungeon[i][j].known ? (dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
 		}
 	}
-	ctx.putImageData(mapTiles[4], 672+((player.x-1)*3), 330+((player.y-1)*3));
+	ctx.putImageData(mapTiles[MT_PLAYER], 672+((player.x-1)*3), 330+((player.y-1)*3));
 	
 }
 
@@ -164,10 +181,10 @@ function attack(att, def) {
 			def.dir = 2;
 		break;
 	} 
-	draw();
+	// draw(); // I THINK THIS SHOULD BE DELETED. WILL UNCOMMENT IF SOMETHING GOES WRONG
 	var success = att.attack > def.defence ? 1 : Math.random() - ((def.defence - att.attack) * Math.random());
 	if (success > 0.2) {
-	var damage = Math.round(Math.abs(Math.random() * 2 * att.attack));
+		var damage = Math.round(Math.abs(Math.random() * 2 * att.attack));
 		def.hp -= damage;
 		log(att.name+' has attacked '+def.name+' and made '+damage+' points of damage.');
 	} else {
@@ -232,10 +249,9 @@ function turn(event) {
 			}
 		}
 
-		for (var i = 1; i < monsters.length; i++) {
+		for (var i = 1; i < monsters.length; i++) { // AI players take their turns
 			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster not dead, make him take his turn
-		}	// AI players take their turns
-		
-		draw();
-	} else draw(); // player pressed the wrong key, only wanted to change the direction or bumped in a wall
+		}
+	}
+	draw();
 }

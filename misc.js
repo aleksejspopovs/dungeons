@@ -8,14 +8,14 @@ function gameOverKeyHandler(e) {
 }
 
 function log(str) {
-	document.getElementById('gamelog').value += str+"\n";
+	document.getElementById('gamelog').value += "\n"+str;
 	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; 
 }
-function log_dec() {
+function logDec() {
 	document.getElementById("gamelog").rows--;
 	window.localStorage.rows = document.getElementById("gamelog").rows;
 }
-function log_inc() {
+function logInc() {
 	document.getElementById("gamelog").rows++;
 	window.localStorage.rows = document.getElementById("gamelog").rows;
 }

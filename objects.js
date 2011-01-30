@@ -41,8 +41,7 @@ function monster(id, type, lvl, mX, mY, dir) {
 				this.moveTo(pathFinding(this.x, this.y, player.x, player.y), 1, 4)
 			} else	{ // else go randomly
 				this.moveTo(rand(1,4), 1, 4);
-			}				
-			draw();
+			}			
 		}
 	}
 	this.dead = function () {
