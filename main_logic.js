@@ -4,86 +4,59 @@
 var dungeon;
 var temp;
 var loaded = 0;
+var toLoad = 7;
 var intervalId = 0;
 
 /* CONST */
 const LEVELMOD = 6;
 const TILESIZE = 32;
+const G_WIDTH = 21;
+const G_HEIGHT = 15;
 
-const MT_FLOOR = 1;
+const D_UP = 1; // tile directions
+const D_DOWN = 3;
+const D_RIGHT = 2;
+const D_LEFT = 4;
+
+const MT_FLOOR = 1; // These are minimap tile IDs
 const MT_WALL = 2;
 const MT_UNDEF = 3;
 const MT_PLAYER = 4;
 const MT_MONSTER = 5;
 
+
 monsterTypes = new Array();
 monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 2, 3);
-monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always choses to GTFO.", 1, 2);
+monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", 1, 2);
+monsterTypes[3] = new monsterType("wdoom", "Winged Doom", "", 80, 80);
+monsterTypes[4] = new monsterType("cancer", "Cancer", "He's the one killing /b/", 10, 10);
+//monsterTypes[5] = new monsterType("pedo", "Pedobear", "And I don't care what people say, and I don't care what people think, and I don't care how we look walking down the street, I love little girls they make me feel so good. ", 10, 20);
+
 player = new playerO("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
 mapTiles = new Array();
+tPlayer = new Array();
+tTerrains = new Array();
 
-function imgLoad() {
+
+function resLoad() {
 	loaded++;
-	if (loaded >= 15) {
+	if (loaded >= toLoad) {
 		document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
 		setTimeout(newGame, 125);
 	}
 }
 
 function init() {
-	if (window.localStorage != undefined) {
+	if (browserCheck()) {
 		if (!window.localStorage.rows) window.localStorage.rows = 10;
 		document.getElementById('gamelog').rows = window.localStorage.rows;
-	}
-	document.getElementById('gamelog').value = "";
-	canvas = document.getElementById('game');
-	if (canvas.getContext){
+		document.getElementById('gamelog').value = "";
+		canvas = document.getElementById('game');
 		ctx = canvas.getContext('2d');
 		ctx.font = "16px sans-serif";
 		ctx.fillText("Please wait while all the necessary crap is loading...", 100, 210);
-		tTerrains = new Array();
-		tTerrains[0] = new Image(); // Undefined (black)
-		tTerrains[0].src = './images/undefined.png';
-		tTerrains[0].onload = imgLoad;
-		tTerrains[1] = new Image(); // Floor
-		tTerrains[1].src = './images/floor.png';
-		tTerrains[1].onload = imgLoad;
-		tTerrains[2] = new Image(); // Wall
-		tTerrains[2].src = './images/wall.png';
-		tTerrains[2].onload = imgLoad;
-
 		
-		tPlayer = new Array(); // Player
-		tPlayer[1] = new Image(); // Player facing up
-		tPlayer[1].src = './images/'+player.image+'/up.png';
-		tPlayer[1].onload = imgLoad;
-		tPlayer[2] = new Image(); // Player facing right
-		tPlayer[2].src = './images/'+player.image+'/right.png';
-		tPlayer[2].onload = imgLoad;
-		tPlayer[3] = new Image(); // Player facing down
-		tPlayer[3].src = './images/'+player.image+'/down.png';
-		tPlayer[3].onload = imgLoad;
-		tPlayer[4] = new Image(); // Player facing left
-		tPlayer[4].src = './images/'+player.image+'/left.png';
-		tPlayer[4].onload = imgLoad;
-		
-		tMonsters = new Array();
-		for (var i = 1; i < monsterTypes.length; i++) {
-			tMonsters[i] = new Array();
-			tMonsters[i][1] = new Image();
-			tMonsters[i][1].src = './images/monsters/'+monsterTypes[i].tile+'_up.png'; 
-			tMonsters[i][1].onload = imgLoad;
-			tMonsters[i][2] = new Image();
-			tMonsters[i][2].src = './images/monsters/'+monsterTypes[i].tile+'_right.png';
-			tMonsters[i][2].onload = imgLoad;
-			tMonsters[i][3] = new Image();
-			tMonsters[i][3].src = './images/monsters/'+monsterTypes[i].tile+'_down.png';
-			tMonsters[i][3].onload = imgLoad;
-			tMonsters[i][4] = new Image();
-			tMonsters[i][4].src = './images/monsters/'+monsterTypes[i].tile+'_left.png';
-			tMonsters[i][4].onload = imgLoad;
-		}
 		mapTiles[MT_FLOOR] = ctx.createImageData(3,3); // floor
 		for (var i = 0; i <= 35; i++) mapTiles[MT_FLOOR].data[i] = 255;
 		mapTiles[MT_WALL] = ctx.createImageData(3,3); // wall
@@ -93,10 +66,49 @@ function init() {
 		mapTiles[MT_PLAYER] = ctx.createImageData(3,3); // player
 		for (var i = 0; i <= 35; i++) mapTiles[MT_PLAYER].data[i] = i % 2 ? 255 : 0;
 		mapTiles[MT_MONSTER] = ctx.createImageData(3,3); // monster
-		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;
-	} else {
-		alert('you are a baka and youre using an outdated browser');
-	}
+		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
+		
+		tTerrains[0] = new Image(); // Undefined (black)
+		tTerrains[0].src = './images/undefined.png';
+		tTerrains[0].onload = resLoad;
+		tTerrains[1] = new Image(); // Floor
+		tTerrains[1].src = './images/floor.png';
+		tTerrains[1].onload = resLoad;
+		tTerrains[2] = new Image(); // Wall
+		tTerrains[2].src = './images/wall.png';
+		tTerrains[2].onload = resLoad;
+		
+		tPlayer[D_UP] = new Image(); // Player facing up
+		tPlayer[D_UP].src = './images/'+player.image+'/up.png';
+		tPlayer[D_UP].onload = resLoad;
+		tPlayer[D_RIGHT] = new Image(); // Player facing right
+		tPlayer[D_RIGHT].src = './images/'+player.image+'/right.png';
+		tPlayer[D_RIGHT].onload = resLoad;
+		tPlayer[D_DOWN] = new Image(); // Player facing down
+		tPlayer[D_DOWN].src = './images/'+player.image+'/down.png';
+		tPlayer[D_DOWN].onload = resLoad;
+		tPlayer[D_LEFT] = new Image(); // Player facing left
+		tPlayer[D_LEFT].src = './images/'+player.image+'/left.png';
+		tPlayer[D_LEFT].onload = resLoad;
+		
+		tMonsters = new Array();
+		for (var i = 1; i < monsterTypes.length; i++) {
+			tMonsters[i] = new Array();
+			tMonsters[i][D_UP] = new Image();
+			tMonsters[i][D_UP].src = './images/monsters/'+monsterTypes[i].tile+'_up.png'; 
+			tMonsters[i][D_UP].onload = resLoad;
+			tMonsters[i][D_RIGHT] = new Image();
+			tMonsters[i][D_RIGHT].src = './images/monsters/'+monsterTypes[i].tile+'_right.png';
+			tMonsters[i][D_RIGHT].onload = resLoad;
+			tMonsters[i][D_DOWN] = new Image();
+			tMonsters[i][D_DOWN].src = './images/monsters/'+monsterTypes[i].tile+'_down.png';
+			tMonsters[i][D_DOWN].onload = resLoad;
+			tMonsters[i][D_LEFT] = new Image();
+			tMonsters[i][D_LEFT].src = './images/monsters/'+monsterTypes[i].tile+'_left.png';
+			tMonsters[i][D_LEFT].onload = resLoad;
+			toLoad += 4;
+		}
+	} else alert("sorry, but your browser is not supported");
 }
 
 function newGame() {
@@ -115,18 +127,12 @@ function draw() {
 	for (var i = player.x-10; i < player.x+11; i++) {
 		for (var j = player.y-7; j < player.y+8; j++) {
 			ctx.drawImage((dungeon[i] != undefined && dungeon[i][j] != undefined) ? tTerrains[dungeon[i][j].tile] : tTerrains[0], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
-			if (dungeon[i] != undefined && dungeon[i][j] != undefined && dungeon[i][j].monster) ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
+			if (dungeon[i] != undefined && dungeon[i][j] != undefined && dungeon[i][j].monster) { 
+				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
+			}
 		}
 	}
 	ctx.drawImage(tPlayer[player.dir], 10*TILESIZE, 7*TILESIZE);
-
-	if (rand(0,3) == 1) {
-		var grid = ctx.getImageData(0, 0, TILESIZE*21, TILESIZE*15);
-		for (var i = 0; i < grid.data.length; i++) {
-			if ((i+1) % 4 != 0) grid.data[i] = 255 - grid.data[i];
-		}
-		ctx.putImageData(grid, 0, 0);
-	}
 
 	ctx.fillStyle = 'gray';
 	ctx.fillRect(672, 0, 822, 480);
@@ -181,7 +187,6 @@ function attack(att, def) {
 			def.dir = 2;
 		break;
 	} 
-	// draw(); // I THINK THIS SHOULD BE DELETED. WILL UNCOMMENT IF SOMETHING GOES WRONG
 	var success = att.attack > def.defence ? 1 : Math.random() - ((def.defence - att.attack) * Math.random());
 	if (success > 0.2) {
 		var damage = Math.round(Math.abs(Math.random() * 2 * att.attack));
@@ -202,22 +207,22 @@ function turn(event) {
 	switch (event.keyCode)
 	{
 		case 0x25:
-			player.dir = 4;
+			player.dir = D_LEFT;
 			event.preventDefault();
 			nX--;
 		break;
 		case 0x26:
-			player.dir = 1;
+			player.dir = D_UP;
 			event.preventDefault();
 			nY--;
 		break;
 		case 0x27:
-			player.dir = 2;
+			player.dir = D_RIGHT;
 			event.preventDefault();
 			nX++;
 		break;
 		case 0x28:
-			player.dir = 3;
+			player.dir = D_DOWN;
 			event.preventDefault();
 			nY++;
 		break;
@@ -253,5 +258,5 @@ function turn(event) {
 			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster not dead, make him take his turn
 		}
 	}
-	draw();
+	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28) || (event.keyCode == 0x0D)) draw();
 }

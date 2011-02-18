@@ -4,7 +4,7 @@
 
 
 function gameOverKeyHandler(e) {
-	if (e.keyCode == 1090 || e.keyCode == 110) newGame();
+	if (e.keyCode == 1090 || e.keyCode == 110 || e.keyCode == 78) newGame();
 }
 
 function log(str) {
@@ -33,16 +33,20 @@ function fillScreenPart() {
 function gameOver(c) {
 	if (!c) {
 		if (navigator.appName == "Opera")
-			document.onkeypress = gameOverKeyHandler;
+			document.onkeypress = null;
 		else 
-			document.onkeydown = gameOverKeyHandler;
-		intervalId = setInterval(fillScreenPart, 125);
+			document.onkeydown = null;
+		intervalId = setInterval(fillScreenPart, 75);
 	} else {
 		ctx.fillStyle = 'white';
 		ctx.font = "54pt Pixelated";
 		ctx.fillText("GAME OVER", 147, 80);
 		ctx.font = "12pt Pixelated";
 		ctx.fillText("Press n to start a new game", 200, 100);
+		if (navigator.appName == "Opera")
+			document.onkeypress = gameOverKeyHandler;
+		else 
+			document.onkeydown = gameOverKeyHandler;
 	}
 }
 
@@ -104,4 +108,8 @@ function pathFinding(tX, tY, fX, fY) {
 		}	
 	}
 	return minDir;
+}
+
+function browserCheck() {
+	return (window.localStorage != undefined) && (document.getElementById('game').getContext);
 }

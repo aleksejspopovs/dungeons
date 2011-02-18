@@ -2,10 +2,11 @@
 // 2010 no copyright — mariofag
 // free software is our future
 
-function dungeonTile(tile, passable, monster) {
+function dungeonTile(tile, passable, monster, item) {
 	this.tile = tile;
 	this.pass = passable;
 	this.monster = monster;
+	this.item = item;
 	this.known = false;
 }
 function monster(id, type, lvl, mX, mY, dir) {
@@ -80,4 +81,8 @@ function playerO(name, image, x, y, dir) {
 		log("You're dead, GAME OVER");
 		gameOver(false);
 	}
+}
+function item(type, subtype) {
+	this.type = type;
+	this.subtype = subtype;
 }
