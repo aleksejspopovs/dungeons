@@ -20,29 +20,26 @@ function monster(id, type, lvl, mX, mY, dir) {
 	this.attack = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
 	this.defence = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
 	this.name = monsterTypes[type].name;
-	this.moveTo = function (dir, i, limit) {
-		var xOff = new Array(0, 0, 1, 0, -1);
-		var yOff = new Array(0, -1, 0, 1, 0);
-		if ((dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass) && !(dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster)) {
-			dungeon[this.x][this.y].monster = 0;
-			this.x += xOff[dir];
-			this.y += yOff[dir];
-			dungeon[this.x][this.y].monster = this.id;
-			this.dir = dir;
-		} else if (i < limit) {
-			this.moveTo((dir + 1) % 5, i+1, limit);
-		}
-	}
 	this.takeTurn = function () {
 		if (Math.abs(this.x - player.x) + Math.abs(this.y - player.y) == 1) {
 			attack(this, player); // if player is near, attack him
 		} else {
-			if ((((this.x - 9) <= player.x) && ((this.x + 9) >= player.x)) && (((this.y - 9) <= player.y) && ((this.y + 9) >= player.y))) { // if can see player, go in his direction
-				//this.moveTo(player.x == this.x ? (player.y > this.y ? 3 : 1) : (player.x > this.x ? 2 : 4), 1, 4);
-				this.moveTo(pathFinding(this.x, this.y, player.x, player.y), 1, 4)
-			} else	{ // else go randomly
-				this.moveTo(rand(1,4), 1, 4);
-			}			
+			var step;
+			if (!(((this.x - 9) <= player.x) && ((this.x + 9) >= player.x) && ((this.y - 9) <= player.y) && ((this.y + 9) >= player.y) && (step = this.findPath(player.x, player.y)))) {
+				var dir = rand(1,4);
+				while (
+					((this.x + xOff[dir]) > 50) || ((this.x + xOff[dir]) < 1) || ((this.y + yOff[dir]) > 50) || ((this.y + yOff[dir]) < 1) || 
+					!dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster
+				) {
+					var dir = rand(1,4);
+				}
+				step = new coords(this.x + xOff[dir], this.y + yOff[dir], dir);
+			}	
+			dungeon[this.x][this.y].monster = false;
+			this.x = step.x;
+			this.y = step.y;
+			this.dir = step.dir;
+			dungeon[this.x][this.y].monster = this.id;	
 		}
 	}
 	this.dead = function () {
@@ -55,6 +52,39 @@ function monster(id, type, lvl, mX, mY, dir) {
 			player.attack = Math.round(Math.random()*3+5) * player.lvl;
 			player.defence = Math.round(Math.random()*3+5) * player.lvl;
 		}
+	}
+	this.findPath = function (tX, tY) {
+		var queue = new Array();
+		var cost = new Array();
+		for (var i = 1; i <= 50; i++) {
+			cost[i] = new Array();
+			for (var j = 1; j <= 50; j++) cost[i][j] = Infinity;
+		}
+		var curX, curY, mvX, mvY;
+		var r = 1; // index of the queue element being read
+		var w = 2; // index of the first empty queue element
+		cost[tX][tY] = 0;
+		queue[1] = new coords(tX, tY, 0);
+		while (r != w) {
+			curX = queue[r].x;
+			curY = queue[r].y;
+			for (i = 1; i <= 4; i++) {
+				mvX = curX + xOff[i];
+				mvY = curY + yOff[i];
+				if ((mvX <= 50) && (mvX >= 1) && (mvY <= 50) && (mvY >= 1) && 
+						(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) && 
+						(!dungeon[mvX][mvY].monster || (mvX == this.x && mvY == this.y))) { // this.x;this.y is a monster obviously, so we should check for that
+					cost[mvX][mvY] = cost[curX][curY]+1;
+					queue[w] = new coords(mvX, mvY, 0);
+					w++;
+					if ((mvX == this.x) && (mvY == this.y)) {
+						return new coords(curX, curY, (i == 1) ? 3 : (i == 2 ? 4 : (i == 3 ? 1 : 2)));
+					}
+				}
+			}
+			r++;
+		}
+		return false;
 	}
 }
 function monsterType(tile, name, desc, modMin, modMax) {
@@ -85,4 +115,9 @@ function playerO(name, image, x, y, dir) {
 function item(type, subtype) {
 	this.type = type;
 	this.subtype = subtype;
+}
+function coords(x, y, dir) {
+	this.x = x;
+	this.y = y;
+	this.dir = dir;
 }

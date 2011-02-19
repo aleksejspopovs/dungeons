@@ -1,11 +1,12 @@
 // main roguelike logic
-// 2010 no copyright — mariofag
+// 2010 no copyright â€” mariofag
 // free software is our future
 var dungeon;
 var temp;
 var loaded = 0;
 var toLoad = 7;
 var intervalId = 0;
+var errorCount = 0;
 
 /* CONST */
 const LEVELMOD = 6;
@@ -24,6 +25,8 @@ const MT_UNDEF = 3;
 const MT_PLAYER = 4;
 const MT_MONSTER = 5;
 
+const xOff = new Array(0, 0, 1, 0, -1);
+const yOff = new Array(0, -1, 0, 1, 0);
 
 monsterTypes = new Array();
 monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 2, 3);
@@ -50,8 +53,12 @@ function resLoad() {
 function init() {
 	if (browserCheck()) {
 		if (!window.localStorage.rows) window.localStorage.rows = 10;
+		if (!window.localStorage.errorDisplay) window.localStorage.errorDisplay = "none";
+		if (!window.localStorage.debugDisplay) window.localStorage.debugDisplay = "none";
 		document.getElementById('gamelog').rows = window.localStorage.rows;
 		document.getElementById('gamelog').value = "";
+		document.getElementById('errorlog').style.display = window.localStorage.errorDisplay;
+		document.getElementById('debuglog').style.display = window.localStorage.debugDisplay;
 		canvas = document.getElementById('game');
 		ctx = canvas.getContext('2d');
 		ctx.font = "16px sans-serif";
@@ -255,7 +262,7 @@ function turn(event) {
 		}
 
 		for (var i = 1; i < monsters.length; i++) { // AI players take their turns
-			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster not dead, make him take his turn
+			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster is not dead, make him take his turn
 		}
 	}
 	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28) || (event.keyCode == 0x0D)) draw();

@@ -1,5 +1,5 @@
 // misc roguelike code
-// 2010 no copyright — mariofag
+// 2010 no copyright â€” mariofag
 // free software is our future
 
 
@@ -19,12 +19,42 @@ function logInc() {
 	document.getElementById("gamelog").rows++;
 	window.localStorage.rows = document.getElementById("gamelog").rows;
 }
+function logError(str) {
+	document.getElementById('errorlog').value += "\n"+str;
+	document.getElementById('errorlog').scrollTop = document.getElementById('errorlog').scrollHeight;
+	errorCount++;
+	document.getElementById('errorToggle').value = "Errors: "+errorCount;
+}
+function toggleErrorDisplay() {
+	if (document.getElementById('errorlog').style.display == "block") {
+		document.getElementById('errorlog').style.display = "none";
+		window.localStorage.errorDisplay = "none";
+	} else {
+		document.getElementById('errorlog').style.display = "block";
+		window.localStorage.errorDisplay = "block";
+		document.getElementById('errorlog').scrollTop = document.getElementById('errorlog').scrollHeight;
+	}
+}
+function logDebug(str) {
+	document.getElementById('debuglog').value += "\n"+str;
+	document.getElementById('debuglog').scrollTop = document.getElementById('debuglog').scrollHeight;
+}
+function toggleDebugDisplay() {
+	if (document.getElementById('debuglog').style.display == "block") {
+		document.getElementById('debuglog').style.display = "none";
+		window.localStorage.debugDisplay = "none";
+	} else {
+		document.getElementById('debuglog').style.display = "block";
+		window.localStorage.debugDisplay = "block";
+		document.getElementById('debuglog').scrollTop = document.getElementById('debuglog').scrollHeight;
+	}
+}
 
 function fillScreenPart() {
 	ctx.fillStyle = 'black';
-	ctx.fillRect(0, 0, 672, 10*temp);
+	ctx.fillRect(0, 0, 672, 5*temp);
 	temp++;
-	if (temp > 48) {
+	if (temp > 96) {
 		clearInterval(intervalId);
 		gameOver(true);
 	}
@@ -36,7 +66,7 @@ function gameOver(c) {
 			document.onkeypress = null;
 		else 
 			document.onkeydown = null;
-		intervalId = setInterval(fillScreenPart, 75);
+		intervalId = setInterval(fillScreenPart, 25);
 	} else {
 		ctx.fillStyle = 'white';
 		ctx.font = "54pt Pixelated";
@@ -59,57 +89,17 @@ function rand(a,b) {
 	return Math.round(Math.random()*(b-a))+parseInt(a);
 }
 
-function pathFinding(tX, tY, fX, fY) {
-	var xOff = new Array(0, 0, 1, 0, -1);
-	var yOff = new Array(0, -1, 0, 1, 0);
-	var queue = new Array();
-	var dung = new Array();
-	for (var i = 1; i <= 50; i++) {
-		dung[i] = new Array();
-		for (var j = 1; j <= 50; j++) dung[i][j] = Infinity;
+function alertAjaxGet(url) { // ATTN: this function isn't supported by IE6 and lower (but fuck that shit)
+	var req = new XMLHttpRequest();
+	req.onreadystatechange=function () {
+		if (req.readyState == 4 && req.status == 200) {
+			alert(req.responseText);
+		}
 	}
-	var curX = fX;
-	var curY = tY;
-	var r = 1;
-	var w = 2;
-	dung[fX][fY] = 0;
-	queue[1] = fX*100+fY;
-	while (!((curX == tX) && (curY == tY)) && !(r == w)) {
-		curX = Math.floor(queue[r]/100);
-		curY = queue[r] % 100;
-		if (curX < 50 && dungeon[curX+1][curY].pass && dung[curX+1][curY] > dung[curX][curY]+1) {
-			dung[curX+1][curY] = dung[curX][curY]+1;
-			queue[w] = (curX+1)*100 + curY;
-			w++;
-		}
-		if (curX > 1 && dungeon[curX-1][curY].pass && dung[curX-1][curY] > dung[curX][curY]+1) {
-			dung[curX-1][curY] = dung[curX][curY]+1;
-			queue[w] = (curX-1)*100 + curY;
-			w++;
-		}
-		if (curY < 50 && dungeon[curX][curY+1].pass && dung[curX][curY+1] > dung[curX][curY]+1) {
-			dung[curX][curY+1] = dung[curX][curY]+1;
-			queue[w] = curX*100 + curY+1;
-			w++;
-		}
-		if (curY > 1 && dungeon[curX][curY-1].pass && dung[curX][curY-1] > dung[curX][curY]+1) {
-			dung[curX][curY-1] = dung[curX][curY]+1;
-			queue[w] = curX*100 + curY-1;
-			w++;
-		}
-		r++;
-	}
-	var minDir = 0;
-	var minVal = Infinity;
-	for (i = 1; i <= 4; i++) {
-		if (dung[tX+xOff[i]][tY+yOff[i]] < minVal) {
-			minVal = dung[tX+xOff[i]][tY+yOff[i]];
-			minDir = i;
-		}	
-	}
-	return minDir;
+	req.open("GET",url,true);
+	req.send();
 }
 
 function browserCheck() {
-	return (window.localStorage != undefined) && (document.getElementById('game').getContext);
+	return (window.localStorage) && (document.getElementById('game').getContext) && (window.XMLHttpRequest);
 }

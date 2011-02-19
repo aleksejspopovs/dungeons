@@ -14,8 +14,6 @@ function generateDungeon() {
 		this.y = y;
 		this.dead = false;
 		this.moveTo = function (dir, i, limit, xMin, xMax, yMin, yMax, check) {
-			var xOff = new Array(0, 0, 1, 0, -1);
-			var yOff = new Array(0, -1, 0, 1, 0);
 			var tempX = this.x + xOff[dir];
 			var tempY = this.y + yOff[dir];
 			if (tempX > xMax || tempY > yMax || tempX < xMin || tempY < yMin || (check && dun[tempX][tempY].pass)) {
