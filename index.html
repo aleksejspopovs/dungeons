@@ -18,7 +18,8 @@ canvas {
 }
 input {
 	font-family: Visitor;
-	font-size: 10px
+	font-size: 10px;
+	border: none;
 }
 #gamelog {
   border: none;
@@ -45,7 +46,7 @@ input {
 <body onLoad='init();'>
 <img src='images/logo.png'> <span id='title'>&lt;insert game name here&gt;</span><br /><br />
 <canvas id='game' width='822' height='480'></canvas><br />
-<input type='button' value='wtf is this?' onClick='alert("This is a canvas-based dungeon-crawling roguelike, being developed by a lazy guy known as mariofag in his spare time. Arts are either stolen or drawn by artists from Russian imageboards (click \"arts info\" for more info on that). The game is deeply in development, so most of the functions are probably missing. You can move by pressing arrow keys, holding Shift makes yout turn on spot, pressing Enter allows you to skip a turn.\n\"Errors: x\" button displays the number of erros. Pressing it will open/close the error log.\nYou can get in touch with me (mariofag) in jabber chatroom erpoge@conference.jabber.ru or in following threads:\n  410chan: http://410chan.ru/dev/res/3218.html (mainly for technical info)\n  Dobrochan: http://dobrochan.ru/cr/res/12955.xhtml (mainly for arts)")' /><input type='button' value='arts info' onClick='alertAjaxGet("arts.txt");' /><input id='errorToggle' type='button' value='Errors: 0' onClick='toggleErrorDisplay();'><input type='button' value='debug' onClick='toggleDebugDisplay();'><input type='button' value='+' onClick='logInc();' /><input type='button' value='-' onClick='logDec();' /><br />
+<input type='button' value='gameover' onClick='gameOver();' /> <input type='button' value='wtf is this?' onClick='alert("This is a canvas-based dungeon-crawling roguelike, being developed by a lazy guy known as mariofag in his spare time. Arts are either stolen or drawn by artists from Russian imageboards (click \"arts info\" for more info on that). The game is deeply in development, so most of the functions are probably missing. You can move by pressing arrow keys, holding Shift makes yout turn on spot, pressing Enter allows you to skip a turn.\n\"Errors: x\" button displays the number of erros. Pressing it will open/close the error log.\nYou can get in touch with me (mariofag) in jabber chatroom erpoge@conference.jabber.ru or in following threads:\n  410chan: http://410chan.ru/dev/res/3218.html (mainly for technical info)\n  Dobrochan: http://dobrochan.ru/cr/res/12955.xhtml (mainly for arts)")' /> <input type='button' value='arts info' onClick='alertAjaxGet("arts.txt");' /> <input id='errorToggle' type='button' value='Errors: 0' onClick='toggleErrorDisplay();'> <input type='button' value='debug' onClick='toggleDebugDisplay();'> <input type='button' value='+' onClick='logInc();' /> <input type='button' value='-' onClick='logDec();' /><br />
 <textarea readonly="readonly" id="gamelog" rows="10"></textarea><br />
 <textarea readonly="readonly" id="errorlog" rows="4"></textarea><br />
 <textarea readonly="readonly" id="debuglog" rows="4"></textarea><br />

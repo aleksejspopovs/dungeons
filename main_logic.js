@@ -120,6 +120,7 @@ function init() {
 
 function newGame() {
 	player = new playerO("Anonymous", "bag", 25, 25, 3, 100, 100, 30, 15);
+	monsters = new Array();
 	dungeon = generateDungeon();
 	temp = 1;
 	draw(); 
@@ -140,6 +141,8 @@ function draw() {
 		}
 	}
 	ctx.drawImage(tPlayer[player.dir], 10*TILESIZE, 7*TILESIZE);
+	
+	ctx.textAlign = "start";
 
 	ctx.fillStyle = 'gray';
 	ctx.fillRect(672, 0, 822, 480);
@@ -198,7 +201,7 @@ function attack(att, def) {
 	if (success > 0.2) {
 		var damage = Math.round(Math.abs(Math.random() * 2 * att.attack));
 		def.hp -= damage;
-		log(att.name+' has attacked '+def.name+' and made '+damage+' points of damage.');
+		log(att.name+' has attacked '+def.name+' and done '+damage+' points of damage.');
 	} else {
 		log(att.name+' has tried to attack '+def.name+', but missed!');
 	}
@@ -250,12 +253,12 @@ function turn(event) {
 			player.hp += rand(0,1);
 			if (player.hp > player.maxHp) player.hp = player.maxHp;
 			
-			if (player.dir % 2 == 0) { // left or right
-				if ((player.x + (player.dir == 4 ? -10 : 10) <= 50) && (player.x + (player.dir == 4 ? -10 : 10) >= 1)) {
+			if (player.dir == D_LEFT || player.dir == D_RIGHT) {
+				if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
 					for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
 				}
 			} else {
-				if ((player.y + (player.dir == 1 ? -7 : 7) <= 50) && (player.y + (player.dir == 1 ? -7 : 7) >= 1)) {
+				if ((player.y + (player.dir == D_UP ? -7 : 7) <= 50) && (player.y + (player.dir == D_UP ? -7 : 7) >= 1)) {
 					for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
 				}
 			}
@@ -265,5 +268,5 @@ function turn(event) {
 			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster is not dead, make him take his turn
 		}
 	}
-	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28) || (event.keyCode == 0x0D)) draw();
+	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28 && dungeon[nX][nY].pass) || (event.keyCode == 0x0D)) draw();
 }

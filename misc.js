@@ -69,10 +69,11 @@ function gameOver(c) {
 		intervalId = setInterval(fillScreenPart, 25);
 	} else {
 		ctx.fillStyle = 'white';
+		ctx.textAlign = "center";
 		ctx.font = "54pt Pixelated";
-		ctx.fillText("GAME OVER", 147, 80);
+		ctx.fillText("GAME OVER", 336, 80);
 		ctx.font = "12pt Pixelated";
-		ctx.fillText("Press n to start a new game", 200, 100);
+		ctx.fillText("Insert coin(s) or press n to start a new game", 336, 100);
 		if (navigator.appName == "Opera")
 			document.onkeypress = gameOverKeyHandler;
 		else 

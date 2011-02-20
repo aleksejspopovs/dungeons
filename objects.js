@@ -108,7 +108,7 @@ function playerO(name, image, x, y, dir) {
 	this.defence = Math.round(Math.random()*3+5);
 	this.dead = function () {
 		player.hp = 0;
-		log("You're dead, GAME OVER");
+		log("You're dead, GAME OVER.");
 		gameOver(false);
 	}
 }
