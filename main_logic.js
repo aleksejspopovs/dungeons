@@ -4,9 +4,10 @@
 var dungeon;
 var temp;
 var loaded = 0;
-var toLoad = 7;
+var toLoad = 8;
 var intervalId = 0;
 var errorCount = 0;
+var exitChoice = 1;
 
 /* CONST */
 const LEVELMOD = 6;
@@ -24,15 +25,18 @@ const MT_WALL = 2;
 const MT_UNDEF = 3;
 const MT_PLAYER = 4;
 const MT_MONSTER = 5;
+const MT_EXIT = 6;
+
+const T_EXIT = 3; // tiles
 
 const xOff = new Array(0, 0, 1, 0, -1);
 const yOff = new Array(0, -1, 0, 1, 0);
 
 monsterTypes = new Array();
-monsterTypes[1] = new monsterType("troll", "Troll", "A normal, fat and green troll.", 2, 3);
-monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", 1, 2);
-monsterTypes[3] = new monsterType("wdoom", "Winged Doom", "", 80, 80);
-monsterTypes[4] = new monsterType("cancer", "Cancer", "He's the one killing /b/", 10, 10);
+monsterTypes[1] = new monsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 2, 3);
+monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 1, 2);
+monsterTypes[3] = new monsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 10, 10);
+monsterTypes[4] = new monsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 9, 9);
 //monsterTypes[5] = new monsterType("pedo", "Pedobear", "And I don't care what people say, and I don't care what people think, and I don't care how we look walking down the street, I love little girls they make me feel so good. ", 10, 20);
 
 player = new playerO("Anonymous", "bag", 25, 25, 3);
@@ -53,12 +57,8 @@ function resLoad() {
 function init() {
 	if (browserCheck()) {
 		if (!window.localStorage.rows) window.localStorage.rows = 10;
-		if (!window.localStorage.errorDisplay) window.localStorage.errorDisplay = "none";
-		if (!window.localStorage.debugDisplay) window.localStorage.debugDisplay = "none";
 		document.getElementById('gamelog').rows = window.localStorage.rows;
 		document.getElementById('gamelog').value = "";
-		document.getElementById('errorlog').style.display = window.localStorage.errorDisplay;
-		document.getElementById('debuglog').style.display = window.localStorage.debugDisplay;
 		canvas = document.getElementById('game');
 		ctx = canvas.getContext('2d');
 		ctx.font = "16px sans-serif";
@@ -74,6 +74,8 @@ function init() {
 		for (var i = 0; i <= 35; i++) mapTiles[MT_PLAYER].data[i] = i % 2 ? 255 : 0;
 		mapTiles[MT_MONSTER] = ctx.createImageData(3,3); // monster
 		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
+		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
+		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4) > 1 ? 255 : 0;		
 		
 		tTerrains[0] = new Image(); // Undefined (black)
 		tTerrains[0].src = './images/undefined.png';
@@ -84,6 +86,9 @@ function init() {
 		tTerrains[2] = new Image(); // Wall
 		tTerrains[2].src = './images/wall.png';
 		tTerrains[2].onload = resLoad;
+		tTerrains[3] = new Image(); // Exit
+		tTerrains[3].src = './images/exit.png';
+		tTerrains[3].onload = resLoad;
 		
 		tPlayer[D_UP] = new Image(); // Player facing up
 		tPlayer[D_UP].src = './images/'+player.image+'/up.png';
@@ -148,7 +153,7 @@ function draw() {
 	ctx.fillRect(672, 0, 822, 480);
 
 	ctx.fillStyle = 'white';
-	ctx.font = "16px Pixelated";
+	ctx.font = "16px '04b03r'";
 	ctx.fillText(player.name, 682, 18);
 	
 	ctx.strokeRect(682, 35, 130, 3);
@@ -171,7 +176,7 @@ function draw() {
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
-				mapTiles[dungeon[i][j].known ? (dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
+				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
@@ -243,30 +248,92 @@ function turn(event) {
 		break;
 	}
 
-	if (nX != -1 && !event.shiftKey && dungeon[nX][nY].pass) {
-		if (dungeon[nX][nY].monster) {
-			attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
-		} else {
-			player.x = nX;
-			player.y = nY;
-			
-			player.hp += rand(0,1);
-			if (player.hp > player.maxHp) player.hp = player.maxHp;
-			
-			if (player.dir == D_LEFT || player.dir == D_RIGHT) {
-				if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
-					for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
-				}
+	if (nX != -1 && !event.shiftKey) {
+		if (dungeon[nX][nY].pass) {
+			if (dungeon[nX][nY].monster) {
+				attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
 			} else {
-				if ((player.y + (player.dir == D_UP ? -7 : 7) <= 50) && (player.y + (player.dir == D_UP ? -7 : 7) >= 1)) {
-					for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
+				player.x = nX;
+				player.y = nY;
+				
+				player.hp += rand(0,1);
+				if (player.hp > player.maxHp) player.hp = player.maxHp;
+				
+				if (player.dir == D_LEFT || player.dir == D_RIGHT) {
+					if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
+						for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
+					}
+				} else {
+					if ((player.y + (player.dir == D_UP ? -7 : 7) <= 50) && (player.y + (player.dir == D_UP ? -7 : 7) >= 1)) {
+						for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
+					}
 				}
 			}
+		} else {
+			if (dungeon[nX][nY].tile == T_EXIT) {
+				levelExit(true);
+			}
 		}
-
 		for (var i = 1; i < monsters.length; i++) { // AI players take their turns
 			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster is not dead, make him take his turn
 		}
 	}
 	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28 && dungeon[nX][nY].pass) || (event.keyCode == 0x0D)) draw();
+}
+
+function levelExitKeyHandler(e) {
+	switch (e.keyCode) {
+		case 0x26:
+			if (exitChoice > 1) exitChoice--;
+		break;
+		case 0x28:
+			if (exitChoice < 3) exitChoice++;
+		break;
+		case 0x0D:
+			switch (exitChoice) {
+				case 1:
+					if (navigator.appName == "Opera")
+						document.onkeypress = turn;
+					else 
+						document.onkeydown = turn;
+					draw();
+				break;
+				case 2:
+					alert("sorry, you cant leave right now");
+				break;
+				case 3:
+					alert("sorry, you cant shop&leave right now");
+				break;
+			}
+		break;
+	}
+	if (e.keyCode != 0x0D) levelExit(false);
+}
+
+function levelExit(full) {
+	if (full) {
+		if (navigator.appName == "Opera")
+			document.onkeypress = levelExitKeyHandler;
+		else 
+			document.onkeydown = levelExitKeyHandler;
+		exitChoice = 1;
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, 672, 480);
+		ctx.fillStyle = 'white';
+		ctx.textAlign = "center";
+		ctx.font = "32pt '04b03r'";
+		ctx.fillText("Escape dungeon", 336, 50);
+		ctx.font = "12pt '04b03r'";
+		ctx.textAlign = "left";
+		ctx.fillText("What do you want to do?", 10, 90);
+	}
+	ctx.font = "12pt '04b03r'";
+	ctx.fillStyle = 'black';
+	ctx.fillRect(450, 75, 222, 65);	
+	ctx.textAlign = "left";
+	ctx.fillStyle = 'white';
+	ctx.fillText("Stay", 662-ctx.measureText("Shop and leave").width, 90);
+	ctx.fillText("Leave", 662-ctx.measureText("Shop and leave").width, 110);
+	ctx.fillText("Shop and leave", 662-ctx.measureText("Shop and leave").width, 130);
+	ctx.fillText(">", 662-ctx.measureText("Shop and leave").width-10, 70 + 20*exitChoice);
 }

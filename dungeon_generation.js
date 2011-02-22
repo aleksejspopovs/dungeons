@@ -39,7 +39,7 @@ function generateDungeon() {
 				cont = false;
 				for(var i = 0; i < 5; i++) {
 					if (!walkers[i].dead) {
-						walkers[i].moveTo(Math.round(Math.random()*3+1), 0, 4, cell.startX+1, cell.endX-1, cell.startY+1, cell.endY-1, true);
+						walkers[i].moveTo(rand(1,4), 0, 4, cell.startX+1, cell.endX-1, cell.startY+1, cell.endY-1, true);
 						if (dun[walkers[i].x-1][walkers[i].y].pass || dun[walkers[i].x+1][walkers[i].y].pass || dun[walkers[i].x][walkers[i].y-1].pass || dun[walkers[i].x][walkers[i].y+1].pass) {
 							dun[walkers[i].x][walkers[i].y].pass = true;
 							dun[walkers[i].x][walkers[i].y].tile = 1;
@@ -99,20 +99,32 @@ function generateDungeon() {
 	for (var i = 4; i >= 0; i--) {
 		for (var j = Math.pow(2, i); j <= Math.pow(2, i+1)-1; j += 2) connect(tree[j], tree[j+1]);
 	}
-	player.x = Math.floor((tree[24].startX + tree[24].endX) / 2);
-	player.y = Math.floor((tree[24].startY + tree[24].endY) / 2);
+	var playerCell = rand(16, 31); // placing player
+	player.x = Math.floor((tree[playerCell].startX + tree[playerCell].endX) / 2);
+	player.y = Math.floor((tree[playerCell].startY + tree[playerCell].endY) / 2);
 	for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) {
 		for (var j = (player.y-7 < 1 ? 1 : player.y-7); j <= (player.y+7 > 50 ? 50 : player.y+7); j++) {
 			dun[i][j].known = true;
 		}
 	}
 	j = 1;
-	for (var i = rand(16,18); i <= 31; i += rand(1,3)) {
-		if (i != 24) {
+	for (var i = rand(16,18); i <= 31; i += rand(1,3)) { // placing monsters
+		if (i != playerCell) {
 			monsters[j] = new monster(j, rand(1, monsterTypes.length-1), 1, Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
 			dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster = j;
 			j++;
 		}
+	}
+	i = rand(16, 31); // placing exit
+	if (i == playerCell || dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster) { // if there's a monster/player in the centre of that room
+		do {
+			var x = rand(tree[i].startX, tree[i].endX);
+			var y = rand(tree[i].startY, tree[i].endY);
+		} while ((!dun[x][y].pass) || (dun[x][y].monster));
+		dun[x][y] = new dungeonTile(T_EXIT, false, 0, 0)
+	} else { // if there's no monster
+		dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].tile = T_EXIT;
+		dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].pass = false;
 	}
 	return dun;
 }

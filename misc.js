@@ -19,36 +19,6 @@ function logInc() {
 	document.getElementById("gamelog").rows++;
 	window.localStorage.rows = document.getElementById("gamelog").rows;
 }
-function logError(str) {
-	document.getElementById('errorlog').value += "\n"+str;
-	document.getElementById('errorlog').scrollTop = document.getElementById('errorlog').scrollHeight;
-	errorCount++;
-	document.getElementById('errorToggle').value = "Errors: "+errorCount;
-}
-function toggleErrorDisplay() {
-	if (document.getElementById('errorlog').style.display == "block") {
-		document.getElementById('errorlog').style.display = "none";
-		window.localStorage.errorDisplay = "none";
-	} else {
-		document.getElementById('errorlog').style.display = "block";
-		window.localStorage.errorDisplay = "block";
-		document.getElementById('errorlog').scrollTop = document.getElementById('errorlog').scrollHeight;
-	}
-}
-function logDebug(str) {
-	document.getElementById('debuglog').value += "\n"+str;
-	document.getElementById('debuglog').scrollTop = document.getElementById('debuglog').scrollHeight;
-}
-function toggleDebugDisplay() {
-	if (document.getElementById('debuglog').style.display == "block") {
-		document.getElementById('debuglog').style.display = "none";
-		window.localStorage.debugDisplay = "none";
-	} else {
-		document.getElementById('debuglog').style.display = "block";
-		window.localStorage.debugDisplay = "block";
-		document.getElementById('debuglog').scrollTop = document.getElementById('debuglog').scrollHeight;
-	}
-}
 
 function fillScreenPart() {
 	ctx.fillStyle = 'black';
@@ -70,9 +40,9 @@ function gameOver(c) {
 	} else {
 		ctx.fillStyle = 'white';
 		ctx.textAlign = "center";
-		ctx.font = "54pt Pixelated";
+		ctx.font = "54pt '04b03r'";
 		ctx.fillText("GAME OVER", 336, 80);
-		ctx.font = "12pt Pixelated";
+		ctx.font = "12pt '04b03r'";
 		ctx.fillText("Insert coin(s) or press n to start a new game", 336, 100);
 		if (navigator.appName == "Opera")
 			document.onkeypress = gameOverKeyHandler;
@@ -90,15 +60,22 @@ function rand(a,b) {
 	return Math.round(Math.random()*(b-a))+parseInt(a);
 }
 
-function alertAjaxGet(url) { // ATTN: this function isn't supported by IE6 and lower (but fuck that shit)
-	var req = new XMLHttpRequest();
-	req.onreadystatechange=function () {
-		if (req.readyState == 4 && req.status == 200) {
-			alert(req.responseText);
-		}
+function closeOverlay() {
+	document.getElementById("overlay").style.display = "none";
+}
+
+function openOverlay(title, content) {
+	document.getElementById("overlayContent").innerHTML = content;
+	document.getElementById("overlayTitle").innerHTML = title;
+	document.getElementById("overlay").style.display = "block";
+}
+
+function generateArtsInfo() {
+	out = "<table>";
+	for (var i = 1; i < monsterTypes.length; i++) {
+		out += "<tr><td><img src='./images/monsters/"+monsterTypes[i].tile+"_down.png' /></td><td><b>"+monsterTypes[i].name+"</b><br /><i>"+monsterTypes[i].desc+"</i><br />Drawn by "+monsterTypes[i].artist+".<br /></td></tr>";
 	}
-	req.open("GET",url,true);
-	req.send();
+	return out+"</table>";
 }
 
 function browserCheck() {

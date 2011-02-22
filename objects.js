@@ -87,10 +87,11 @@ function monster(id, type, lvl, mX, mY, dir) {
 		return false;
 	}
 }
-function monsterType(tile, name, desc, modMin, modMax) {
+function monsterType(tile, name, desc, artist, modMin, modMax) {
 	this.tile = tile;
 	this.name = name;
 	this.desc = desc;
+	this.artist = artist;
 	this.modMin = modMin;
 	this.modMax = modMax;
 }

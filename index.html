@@ -10,11 +10,17 @@
 <link rel="stylesheet" href="fonts/stylesheet.css" type="text/css" charset="utf-8">
 <style>
 #title {
-	font-family: Pixelated;
+	font-family: '04b03r';
 	font-size: 40px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	height: 40px;
 }
 canvas {
 	border: solid 1px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	height: 480px;
 }
 input {
 	font-family: Visitor;
@@ -25,31 +31,38 @@ input {
   border: none;
   width: 822px;
   font-size: 12pt;
-  font-family: Pixelated;
+  font-family: '04b03r';
   margin-left: 0px;
 }
-#errorlog {
-  width: 822px;
-	border: solid 1px red;
-	color: red;
-	display: none;
+#overlay {
+	font-family: '04b03r';
+	font-size: 12pt;
+  border: solid 1px black;
+	position: absolute;
+	width: 792px;
+  height: 450px;
+  left: 18px;
+  top: 59px;
+  background-color: white;
+  padding: 5px 5px 5px 5px;
+  overflow: auto;
+  display: none;
 }
-
-#debuglog {
-  width: 822px;
-	border: solid 1px #E48400;
-	color: #E48400;
-	display: none;
+#overlayTitle {
+	font-weight: bold;
+	font-size: 16px;
 }
 </style>
 </head>
 <body onLoad='init();'>
-<img src='images/logo.png'> <span id='title'>&lt;insert game name here&gt;</span><br /><br />
+<span id='title'><img src='images/logo.png'> &lt;insert game name here&gt;</span><br />
 <canvas id='game' width='822' height='480'></canvas><br />
-<input type='button' value='gameover' onClick='gameOver();' /> <input type='button' value='wtf is this?' onClick='alert("This is a canvas-based dungeon-crawling roguelike, being developed by a lazy guy known as mariofag in his spare time. Arts are either stolen or drawn by artists from Russian imageboards (click \"arts info\" for more info on that). The game is deeply in development, so most of the functions are probably missing. You can move by pressing arrow keys, holding Shift makes yout turn on spot, pressing Enter allows you to skip a turn.\n\"Errors: x\" button displays the number of erros. Pressing it will open/close the error log.\nYou can get in touch with me (mariofag) in jabber chatroom erpoge@conference.jabber.ru or in following threads:\n  410chan: http://410chan.ru/dev/res/3218.html (mainly for technical info)\n  Dobrochan: http://dobrochan.ru/cr/res/12955.xhtml (mainly for arts)")' /> <input type='button' value='arts info' onClick='alertAjaxGet("arts.txt");' /> <input id='errorToggle' type='button' value='Errors: 0' onClick='toggleErrorDisplay();'> <input type='button' value='debug' onClick='toggleDebugDisplay();'> <input type='button' value='+' onClick='logInc();' /> <input type='button' value='-' onClick='logDec();' /><br />
+<div id="overlay">
+	<span id="overlayTitle">ovTitle</span><span id="overlayClose"><img align="right" src="./images/close.png" onClick="closeOverlay();" /></span><br />
+	<span id="overlayContent">ovCont</span>
+</div>
+<input type='button' value='wtf is this?' onClick='openOverlay("About this game", "This is a canvas-based dungeon-crawling roguelike, being developed by a lazy guy known as mariofag in his spare time. Arts are either stolen or drawn by artists from Russian imageboards (click \"arts info\" for more info on that). The game is deeply in development, so most of the functions are probably missing.<br />You can move by pressing arrow keys, holding Shift makes yout turn on spot, pressing Enter allows you to skip a turn.<br />You can get in touch with me (mariofag) in jabber chatroom erpoge@conference.jabber.ru or in following threads:<ul><li><a href=\"http://410chan.ru/dev/res/3218.html\">410chan</a> (mainly for technical info)</li><li><a href=\"http://dobrochan.ru/cr/res/12955.xhtml\">Dobrochan</a> (mainly for arts)</ul>")' /> <input type='button' value='arts info' onClick='openOverlay("Arts", generateArtsInfo());' /><input type='button' value='+' onClick='logInc();' /> <input type='button' value='-' onClick='logDec();' /><br />
 <textarea readonly="readonly" id="gamelog" rows="10"></textarea><br />
-<textarea readonly="readonly" id="errorlog" rows="4"></textarea><br />
-<textarea readonly="readonly" id="debuglog" rows="4"></textarea><br />
 Host kindly provided by <a href="http://shell.tor.hu">shell.tor.hu</a>, great web host with shell access, real hardware and low prices. More info at <a href="http://cp.tor.hu">cp.tor.hu</a>.
 </body>
 </html>
