@@ -8,8 +8,8 @@ function gameOverKeyHandler(e) {
 }
 
 function log(str) {
-	document.getElementById('gamelog').value += "\n"+str;
-	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; 
+	/*document.getElementById('gamelog').value += "\n"+str;
+	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; */
 }
 function logDec() {
 	document.getElementById("gamelog").rows--;
@@ -75,6 +75,9 @@ function generateArtsInfo() {
 	for (var i = 1; i < monsterTypes.length; i++) {
 		out += "<tr><td><img src='./images/monsters/"+monsterTypes[i].tile+"_down.png' /></td><td><b>"+monsterTypes[i].name+"</b><br /><i>"+monsterTypes[i].desc+"</i><br />Drawn by "+monsterTypes[i].artist+".<br /></td></tr>";
 	}
+	out += "<tr><td colspan='2' style='font-weight: bold;	font-size: 12pt;'>Fonts</td></tr>";
+	out += "<tr><td style='font-family: Visitor; font-size: 16pt'>Abc<br />123</td><td>Visitor font<br />Free for personal use.<br /><i>Made by AEnigma (Brian Kent).</td>";
+	out += "<tr><td style='font-family: \"04b03r\"; font-size: 12pt'>Abc<br />Абв<br />123</td><td>04b03rus font<br />Free for any (personal, commercial, etc) use.<br /><i>Made by <a href='http://www.04.jp.org/'>04</a>. Cyryllic symbols added by Endou.</td>";
 	return out+"</table>";
 }
 

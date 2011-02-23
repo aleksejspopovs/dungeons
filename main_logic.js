@@ -49,16 +49,16 @@ tTerrains = new Array();
 function resLoad() {
 	loaded++;
 	if (loaded >= toLoad) {
-		document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
+		//document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
 		setTimeout(newGame, 125);
 	}
 }
 
 function init() {
 	if (browserCheck()) {
-		if (!window.localStorage.rows) window.localStorage.rows = 10;
+		/*if (!window.localStorage.rows) window.localStorage.rows = 10;
 		document.getElementById('gamelog').rows = window.localStorage.rows;
-		document.getElementById('gamelog').value = "";
+		document.getElementById('gamelog').value = "";*/
 		canvas = document.getElementById('game');
 		ctx = canvas.getContext('2d');
 		ctx.font = "16px sans-serif";
@@ -124,7 +124,7 @@ function init() {
 }
 
 function newGame() {
-	player = new playerO("Anonymous", "bag", 25, 25, 3, 100, 100, 30, 15);
+	player = new playerO("Anonymous", "bag", 25, 25, 4);
 	monsters = new Array();
 	dungeon = generateDungeon();
 	temp = 1;
@@ -176,7 +176,8 @@ function draw() {
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
-				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
+				//mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
+				mapTiles[dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
@@ -274,8 +275,10 @@ function turn(event) {
 				levelExit(true);
 			}
 		}
-		for (var i = 1; i < monsters.length; i++) { // AI players take their turns
-			if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster is not dead, make him take his turn
+		if (dungeon[nX][nY].pass || dungeon[nX][nY].tile == T_EXIT) {
+			for (var i = 1; i < monsters.length; i++) { // AI players take their turns
+				if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster is not dead, make him take his turn
+			}
 		}
 	}
 	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28 && dungeon[nX][nY].pass) || (event.keyCode == 0x0D)) draw();
@@ -285,9 +288,11 @@ function levelExitKeyHandler(e) {
 	switch (e.keyCode) {
 		case 0x26:
 			if (exitChoice > 1) exitChoice--;
+			e.preventDefault();
 		break;
 		case 0x28:
 			if (exitChoice < 3) exitChoice++;
+			e.preventDefault();
 		break;
 		case 0x0D:
 			switch (exitChoice) {

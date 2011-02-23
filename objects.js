@@ -25,7 +25,7 @@ function monster(id, type, lvl, mX, mY, dir) {
 			attack(this, player); // if player is near, attack him
 		} else {
 			var step;
-			if (!(((this.x - 9) <= player.x) && ((this.x + 9) >= player.x) && ((this.y - 9) <= player.y) && ((this.y + 9) >= player.y) && (step = this.findPath(player.x, player.y)))) {
+			if (!/*(((this.x - 9) <= player.x) && ((this.x + 9) >= player.x) && ((this.y - 9) <= player.y) && ((this.y + 9) >= player.y) && */(step = this.findPath(player.x, player.y))/*)*/) {
 				var dir = rand(1,4);
 				while (
 					((this.x + xOff[dir]) > 50) || ((this.x + xOff[dir]) < 1) || ((this.y + yOff[dir]) > 50) || ((this.y + yOff[dir]) < 1) || 
@@ -103,7 +103,7 @@ function playerO(name, image, x, y, dir) {
 	this.dir = dir;
 	this.xp = 0;
 	this.lvl = 1;
-	this.maxHp = 50;
+	this.maxHp = Infinity;
 	this.hp = this.maxHp;
 	this.attack = Math.round(Math.random()*3+5);
 	this.defence = Math.round(Math.random()*3+5);
