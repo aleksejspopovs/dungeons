@@ -37,6 +37,8 @@ monsterTypes[1] = new monsterType("troll", "Troll", "An ordinary fat and green t
 monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 1, 2);
 monsterTypes[3] = new monsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 10, 10);
 monsterTypes[4] = new monsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 9, 9);
+monsterTypes[5] = new monsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 5, 6);
+
 //monsterTypes[5] = new monsterType("pedo", "Pedobear", "And I don't care what people say, and I don't care what people think, and I don't care how we look walking down the street, I love little girls they make me feel so good. ", 10, 20);
 
 player = new playerO("Anonymous", "bag", 25, 25, 3);
@@ -176,8 +178,8 @@ function draw() {
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
-				//mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
-				mapTiles[dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)],
+				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
+				//mapTiles[dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
