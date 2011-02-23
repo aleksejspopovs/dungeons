@@ -49,16 +49,16 @@ tTerrains = new Array();
 function resLoad() {
 	loaded++;
 	if (loaded >= toLoad) {
-		//document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
+		document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
 		setTimeout(newGame, 125);
 	}
 }
 
 function init() {
 	if (browserCheck()) {
-		/*if (!window.localStorage.rows) window.localStorage.rows = 10;
+		if (!window.localStorage.rows) window.localStorage.rows = 10;
 		document.getElementById('gamelog').rows = window.localStorage.rows;
-		document.getElementById('gamelog').value = "";*/
+		document.getElementById('gamelog').value = "";
 		canvas = document.getElementById('game');
 		ctx = canvas.getContext('2d');
 		ctx.font = "16px sans-serif";

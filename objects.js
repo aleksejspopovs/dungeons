@@ -103,7 +103,7 @@ function playerO(name, image, x, y, dir) {
 	this.dir = dir;
 	this.xp = 0;
 	this.lvl = 1;
-	this.maxHp = Infinity;
+	this.maxHp = 50;
 	this.hp = this.maxHp;
 	this.attack = Math.round(Math.random()*3+5);
 	this.defence = Math.round(Math.random()*3+5);

@@ -8,8 +8,8 @@ function gameOverKeyHandler(e) {
 }
 
 function log(str) {
-	/*document.getElementById('gamelog').value += "\n"+str;
-	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; */
+	document.getElementById('gamelog').value += "\n"+str;
+	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; 
 }
 function logDec() {
 	document.getElementById("gamelog").rows--;
