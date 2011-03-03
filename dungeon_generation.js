@@ -126,5 +126,12 @@ function generateDungeon() {
 		dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].tile = T_EXIT;
 		dun[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].pass = false;
 	}
+	for (i=1; i<=50; i++) {
+		for (j=1; j<=50; j++) {
+			if (dun[i][j].tile == 2 && (dun[i][j+1] == undefined || dun[i][j+1].tile != 2)) {
+				dun[i][j].tile = 4;
+			}
+		}
+	}
 	return dun;
 }

@@ -1,45 +1,12 @@
 // main roguelike logic
 // 2010 no copyright — mariofag
 // free software is our future
-var dungeon;
-var temp;
+var dungeon, temp, bgm;
 var loaded = 0;
-var toLoad = 8;
+var toLoad = 9;
 var intervalId = 0;
 var errorCount = 0;
 var exitChoice = 1;
-
-/* CONST */
-const LEVELMOD = 6;
-const TILESIZE = 32;
-const G_WIDTH = 21;
-const G_HEIGHT = 15;
-
-const D_UP = 1; // tile directions
-const D_DOWN = 3;
-const D_RIGHT = 2;
-const D_LEFT = 4;
-
-const MT_FLOOR = 1; // These are minimap tile IDs
-const MT_WALL = 2;
-const MT_UNDEF = 3;
-const MT_PLAYER = 4;
-const MT_MONSTER = 5;
-const MT_EXIT = 6;
-
-const T_EXIT = 3; // tiles
-
-const xOff = new Array(0, 0, 1, 0, -1);
-const yOff = new Array(0, -1, 0, 1, 0);
-
-monsterTypes = new Array();
-monsterTypes[1] = new monsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 2, 3);
-monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 1, 2);
-monsterTypes[3] = new monsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 10, 10);
-monsterTypes[4] = new monsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 9, 9);
-monsterTypes[5] = new monsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 5, 6);
-
-//monsterTypes[5] = new monsterType("pedo", "Pedobear", "And I don't care what people say, and I don't care what people think, and I don't care how we look walking down the street, I love little girls they make me feel so good. ", 10, 20);
 
 player = new playerO("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
@@ -77,7 +44,7 @@ function init() {
 		mapTiles[MT_MONSTER] = ctx.createImageData(3,3); // monster
 		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
 		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
-		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4) > 1 ? 255 : 0;		
+		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4 == 0) ? 0 : (i % 4 == 1) ? 127 : 255;		
 		
 		tTerrains[0] = new Image(); // Undefined (black)
 		tTerrains[0].src = './images/undefined.png';
@@ -91,6 +58,9 @@ function init() {
 		tTerrains[3] = new Image(); // Exit
 		tTerrains[3].src = './images/exit.png';
 		tTerrains[3].onload = resLoad;
+		tTerrains[4] = new Image(); // Wall corner
+		tTerrains[4].src = './images/wall_corner.png';
+		tTerrains[4].onload = resLoad;
 		
 		tPlayer[D_UP] = new Image(); // Player facing up
 		tPlayer[D_UP].src = './images/'+player.image+'/up.png';
@@ -122,6 +92,16 @@ function init() {
 			tMonsters[i][D_LEFT].onload = resLoad;
 			toLoad += 4;
 		}
+		
+		bgm = new Audio("./music/"+music[rand(0, music.length-1)]);
+		bgm.loop = true;
+		if (!window.localStorage.bgm) window.localStorage.bgm = "off";
+		document.getElementById("bgmButton").value = "music: "+window.localStorage.bgm;
+		if (window.localStorage.bgm == "on") // um... damn localStorage only works with strings
+			bgm.play();
+		else
+			bgm.pause();
+		
 	} else alert("sorry, but your browser is not supported");
 }
 

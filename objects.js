@@ -45,7 +45,7 @@ function monster(id, type, lvl, mX, mY, dir) {
 	this.dead = function () {
 		dungeon[this.x][this.y].monster = 0;
 		player.xp += (player.lvl - this.lvl + 2) * rand(monsterTypes[this.type].modMin, monsterTypes[this.type].modMax);
-		if (player.xp >= ((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD)) {
+		while (player.xp >= ((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD)) {
 			player.lvl++;
 			log(player.name+" has leveled up! His level is now "+player.lvl+".");
 			player.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;

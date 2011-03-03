@@ -20,6 +20,15 @@ function logInc() {
 	window.localStorage.rows = document.getElementById("gamelog").rows;
 }
 
+function toggleBgm() {
+	window.localStorage.bgm = window.localStorage.bgm == "on" ? "off" : "on";
+	document.getElementById("bgmButton").value = "music: "+window.localStorage.bgm;
+	if (window.localStorage.bgm == "on")
+		bgm.play();
+	else
+		bgm.pause();
+}
+
 function fillScreenPart() {
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0, 0, 672, 5*temp);
@@ -78,6 +87,10 @@ function generateArtsInfo() {
 	out += "<tr><td colspan='2' style='font-weight: bold;	font-size: 12pt;'>Fonts</td></tr>";
 	out += "<tr><td style='font-family: Visitor; font-size: 16pt'>Abc<br />123</td><td>Visitor font<br />Free for personal use.<br /><i>Made by AEnigma (Brian Kent).</td>";
 	out += "<tr><td style='font-family: \"04b03r\"; font-size: 12pt'>Abc<br />Абв<br />123</td><td>04b03rus font<br />Free for any (personal, commercial, etc) use.<br /><i>Made by <a href='http://www.04.jp.org/'>04</a>. Cyryllic symbols added by Endou.</td>";
+	out += "<tr><td colspan='2' style='font-weight: bold;	font-size: 12pt;'>Music</td></tr>";
+	out += "<tr><td><img src='./images/music.png'></td><td>Another corridor<br /><i>Made by Anonymous musician from Dobrochan #1.</td>";
+	out += "<tr><td><img src='./images/music.png'></td><td>Winged tune<br /><i>Made by Anonymous musician from Dobrochan #2.</td>";
+	
 	return out+"</table>";
 }
 
