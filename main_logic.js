@@ -119,15 +119,18 @@ function newGame() {
 }
 
 function draw() {
-	for (var i = player.x-10; i < player.x+11; i++) {
-		for (var j = player.y-7; j < player.y+8; j++) {
-			ctx.drawImage((dungeon[i] != undefined && dungeon[i][j] != undefined) ? tTerrains[dungeon[i][j].tile] : tTerrains[0], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
-			if (dungeon[i] != undefined && dungeon[i][j] != undefined && dungeon[i][j].monster) { 
-				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-player.x+10)*TILESIZE, (j-player.y+7)*TILESIZE);
+	var startX, startY;
+	startX = Math.max(1, Math.min(51-G_WIDTH, player.x-10));
+	startY = Math.max(1, Math.min(51-G_HEIGHT, player.y-7));
+	for (var i = startX; i < startX + G_WIDTH; i++) {
+		for (var j = startY; j < startY + G_HEIGHT; j++) {
+			ctx.drawImage(tTerrains[dungeon[i][j].tile], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
+			if (dungeon[i][j].monster) { 
+				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 			}
 		}
 	}
-	ctx.drawImage(tPlayer[player.dir], 10*TILESIZE, 7*TILESIZE);
+	ctx.drawImage(tPlayer[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);
 	
 	ctx.textAlign = "start";
 
@@ -159,7 +162,6 @@ function draw() {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
 				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
-				//mapTiles[dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);

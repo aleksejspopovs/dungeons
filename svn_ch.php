@@ -1,4 +1,4 @@
 <?
-$output = shell_exec("/home/popoffka/www/updateDun.sh");
+$output = shell_exec("svn up");
 echo "<pre>$output</pre>";
 ?>
