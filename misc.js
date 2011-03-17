@@ -1,10 +1,10 @@
 // misc roguelike code
-// 2010 no copyright — mariofag
+// 2010 no copyright -- mariofag
 // free software is our future
 
 
 function gameOverKeyHandler(e) {
-	if (e.keyCode == 1090 || e.keyCode == 110 || e.keyCode == 78) newGame();
+	if (e.keyCode == 1090 || e.keyCode == 110 || e.keyCode == 78) newGame(1);
 }
 
 function log(str) {
@@ -92,6 +92,10 @@ function generateArtsInfo() {
 	out += "<tr><td><img src='./images/music.png'></td><td>Winged tune<br /><i>Made by Anonymous musician from Dobrochan #2.</td>";
 	
 	return out+"</table>";
+}
+
+function getFloorString(floor) {
+  return Math.round((floor % 100)/10) == 1 ? (floor+"th") : (floor % 10 == 1 ? (floor+"st") : (floor % 10 == 2 ? (floor+"nd") : (floor % 10 == 3 ? (floor+"rd") : (floor+"th"))));
 }
 
 function browserCheck() {

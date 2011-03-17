@@ -1,5 +1,5 @@
 // roguelike object declaring code
-// 2010 no copyright — mariofag
+// 2010 no copyright -- mariofag
 // free software is our future
 
 function dungeonTile(tile, passable, monster, item) {
@@ -20,26 +20,36 @@ function monster(id, type, lvl, mX, mY, dir) {
 	this.attack = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
 	this.defence = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
 	this.name = monsterTypes[type].name;
+  this.see = function (whom) {
+    return ((Math.abs(this.x - whom.x) <= 9) && (Math.abs(this.y - whom.y) <= 9));
+  }
 	this.takeTurn = function () {
 		if (Math.abs(this.x - player.x) + Math.abs(this.y - player.y) == 1) {
 			attack(this, player); // if player is near, attack him
 		} else {
 			var step;
-			if (!(((this.x - 9) <= player.x) && ((this.x + 9) >= player.x) && ((this.y - 9) <= player.y) && ((this.y + 9) >= player.y) && (step = this.findPath(player.x, player.y)))) {
+			if (!this.see(player) || !(step = this.findPath(player.x, player.y))) { // if the monster doesn't see player, or can't get to him
 				var dir = rand(1,4);
-				while (
-					((this.x + xOff[dir]) > 50) || ((this.x + xOff[dir]) < 1) || ((this.y + yOff[dir]) > 50) || ((this.y + yOff[dir]) < 1) || 
+        tries = 0;
+				while ((
+					((this.x + xOff[dir]) > LEVELSIZE) || ((this.x + xOff[dir]) < 1) || ((this.y + yOff[dir]) > LEVELSIZE) || ((this.y + yOff[dir]) < 1) || 
 					!dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster
-				) {
-					var dir = rand(1,4);
+				) && tries < 5) { // 5 is here just for it to be easier to check whether monster found a way or not
+					dir = dir % 4 + 1;
+          tries++;
 				}
-				step = new coords(this.x + xOff[dir], this.y + yOff[dir], dir);
-			}	
-			dungeon[this.x][this.y].monster = false;
-			this.x = step.x;
-			this.y = step.y;
-			this.dir = step.dir;
-			dungeon[this.x][this.y].monster = this.id;	
+        if (tries == 5)
+          step = null;
+        else
+          step = new coords(this.x + xOff[dir], this.y + yOff[dir], dir);
+			}
+      if (step != null) {
+        dungeon[this.x][this.y].monster = false;
+        this.x = step.x;
+        this.y = step.y;
+        this.dir = step.dir;
+        dungeon[this.x][this.y].monster = this.id;
+      } // else monster can't do anything (so he doesn't do anything)
 		}
 	}
 	this.dead = function () {

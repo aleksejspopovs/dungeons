@@ -1,5 +1,5 @@
 // main roguelike logic
-// 2010 no copyright — mariofag
+// 2010 no copyright -- mariofag
 // free software is our future
 var dungeon, temp, bgm;
 var loaded = 0;
@@ -19,7 +19,7 @@ function resLoad() {
 	loaded++;
 	if (loaded >= toLoad) {
 		document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
-		setTimeout(newGame, 125);
+		setTimeout(function () {newGame(1); }, 125);
 	}
 }
 
@@ -97,7 +97,7 @@ function init() {
 		bgm.loop = true;
 		if (!window.localStorage.bgm) window.localStorage.bgm = "off";
 		document.getElementById("bgmButton").value = "music: "+window.localStorage.bgm;
-		if (window.localStorage.bgm == "on") // um... damn localStorage only works with strings
+		if (window.localStorage.bgm == "on") // erm... damn localStorage only works with strings, no booleans :(
 			bgm.play();
 		else
 			bgm.pause();
@@ -105,17 +105,17 @@ function init() {
 	} else alert("sorry, but your browser is not supported");
 }
 
-function newGame() {
-	player = new playerO("Anonymous", "bag", 25, 25, 4);
+function newGame(level) {
+	if (level == 1) player = new playerO("Anonymous", "bag", 25, 25, 4);
 	monsters = new Array();
-	dungeon = generateDungeon();
+	dungeon = generateDungeon(level);
 	temp = 1;
 	draw(); 
 	if (navigator.appName == "Opera")
 		document.onkeypress = turn;
 	else 
 		document.onkeydown = turn;
-	log(player.name+" has entered the dungeon.");
+	log(player.name+" has entered the dungeon's "+getFloorString(level)+" floor.");
 }
 
 function draw() {
@@ -152,6 +152,7 @@ function draw() {
 	ctx.fillStyle = 'white';
 	ctx.font = "10px Visitor";
 	ctx.fillText("level "+player.lvl, 682, 26);
+	ctx.fillText(getFloorString(dungeon.level)+" floor", 747, 26);
 	ctx.fillText(player.hp+"/"+player.maxHp+" HP", 682, 47);
 	ctx.fillText(player.xp+"/"+((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD)+" XP", 682, 67);
 	ctx.fillText("ATT: "+player.attack, 682, 78);
@@ -204,8 +205,7 @@ function attack(att, def) {
 function turn(event) {
 	var nX = player.x;
 	var nY = player.y;
-	switch (event.keyCode)
-	{
+	switch (event.keyCode) {
 		case 0x25:
 			player.dir = D_LEFT;
 			event.preventDefault();
@@ -234,38 +234,39 @@ function turn(event) {
 	}
 
 	if (nX != -1 && !event.shiftKey) {
-		if (dungeon[nX][nY].pass) {
-			if (dungeon[nX][nY].monster) {
-				attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
-			} else {
-				player.x = nX;
-				player.y = nY;
-				
-				player.hp += rand(0,1);
-				if (player.hp > player.maxHp) player.hp = player.maxHp;
-				
-				if (player.dir == D_LEFT || player.dir == D_RIGHT) {
-					if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
-						for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
-					}
-				} else {
-					if ((player.y + (player.dir == D_UP ? -7 : 7) <= 50) && (player.y + (player.dir == D_UP ? -7 : 7) >= 1)) {
-						for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
-					}
-				}
-			}
-		} else {
-			if (dungeon[nX][nY].tile == T_EXIT) {
-				levelExit(true);
-			}
-		}
-		if (dungeon[nX][nY].pass || dungeon[nX][nY].tile == T_EXIT) {
-			for (var i = 1; i < monsters.length; i++) { // AI players take their turns
-				if (monsters[i].hp > 0 && player.hp > 0) monsters[i].takeTurn(); // if monster is not dead, make him take his turn
-			}
-		}
-	}
-	if ((event.keyCode >= 0x25 && event.keyCode <= 0x28 && dungeon[nX][nY].pass) || (event.keyCode == 0x0D)) draw();
+    if (dungeon[nX][nY].pass) {
+      if (dungeon[nX][nY].monster) {
+        attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
+      } else {
+        player.x = nX;
+        player.y = nY;
+        
+        player.hp += rand(0,1);
+        if (player.hp > player.maxHp) player.hp = player.maxHp;
+        
+        if (player.dir == D_LEFT || player.dir == D_RIGHT) { // TODO: completely rewrite this piece of shit
+          if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
+            for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
+          }
+        } else {
+          if ((player.y + (player.dir == D_UP ? -7 : 7) <= 50) && (player.y + (player.dir == D_UP ? -7 : 7) >= 1)) {
+            for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
+          }
+        }
+      }
+    } else {
+      if (dungeon[nX][nY].tile == T_EXIT)
+        levelExit(true);
+    }
+    if (dungeon[nX][nY].pass || dungeon[nX][nY].tile == T_EXIT) {
+      for (var i = 1; i < monsters.length; i++) { // AI players take their turns
+        if (monsters[i].hp > 0 && player.hp > 0) 
+          monsters[i].takeTurn(); // if monster is not dead, make him take his turn
+      }
+    }
+  }
+  if (nX != -1 && dungeon[nX][nY].tile != T_EXIT) // I know that (nX != 1) appears in both if's, however, i thought this would be better for readability (less tabs) 
+    draw();
 }
 
 function levelExitKeyHandler(e) {
@@ -288,10 +289,11 @@ function levelExitKeyHandler(e) {
 					draw();
 				break;
 				case 2:
-					alert("sorry, you cant leave right now");
+					log(player.name + " has decided to get deeper into this dungeon.");
+					newGame(dungeon.level + 1);
 				break;
 				case 3:
-					alert("sorry, you cant shop&leave right now");
+					alert("sorry, shop isn't implemented yet :(");
 				break;
 			}
 		break;

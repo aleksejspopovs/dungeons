@@ -1,5 +1,5 @@
 // constant definitions
-// 2010 no copyright — mariofag
+// 2010 no copyright -- mariofag
 // free software is our future
 
 /* CONST */
@@ -7,6 +7,7 @@ const LEVELMOD = 6;
 const TILESIZE = 32;
 const G_WIDTH = 21;
 const G_HEIGHT = 15;
+const LEVELSIZE = 50;
 
 const D_UP = 1; // tile directions
 const D_DOWN = 3;

@@ -1,8 +1,8 @@
 // roguelike dungeon generating code
-// 2010 no copyright — mariofag
+// 2010 no copyright -- mariofag
 // free software is our future
 
-function generateDungeon() {
+function generateDungeon(level) {
 	function treeGrid(startX, startY, endX, endY) {
 		this.startX = startX;
 		this.startY = startY;
@@ -133,5 +133,6 @@ function generateDungeon() {
 			}
 		}
 	}
+	dun.level = level;
 	return dun;
 }
