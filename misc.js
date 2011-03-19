@@ -41,10 +41,7 @@ function fillScreenPart() {
 
 function gameOver(c) {
 	if (!c) {
-		if (navigator.appName == "Opera")
-			document.onkeypress = null;
-		else 
-			document.onkeydown = null;
+		setKeyListener(null);
 		intervalId = setInterval(fillScreenPart, 25);
 	} else {
 		ctx.fillStyle = 'white';
@@ -53,10 +50,7 @@ function gameOver(c) {
 		ctx.fillText("GAME OVER", 336, 80);
 		ctx.font = "12pt '04b03r'";
 		ctx.fillText("Insert coin(s) or press n to start a new game", 336, 100);
-		if (navigator.appName == "Opera")
-			document.onkeypress = gameOverKeyHandler;
-		else 
-			document.onkeydown = gameOverKeyHandler;
+		setKeyListener(gameOverKeyHandler);
 	}
 }
 
@@ -67,6 +61,21 @@ function rand(a,b) {
 		b = a;
 	}
 	return Math.round(Math.random()*(b-a))+parseInt(a);
+}
+
+function randH(a,b) {
+  return rand(a,b) + (Math.random() >= 0.5 ? 0.5 : 0);
+}
+
+function randHalf() {
+  var x = Math.random();
+  while (x > 0.5)
+    x = Math.random();
+  return x;
+}
+
+function checkCoords(x, y) {
+  return x >= 1 && x <= LEVELSIZE && y >= 1 && y <= LEVELSIZE;
 }
 
 function closeOverlay() {
@@ -100,4 +109,11 @@ function getFloorString(floor) {
 
 function browserCheck() {
 	return (window.localStorage) && (document.getElementById('game').getContext) && (window.XMLHttpRequest);
+}
+
+function setKeyListener(l) {
+  if (navigator.appName == "Opera")
+    document.onkeypress = l;
+  else 
+    document.onkeydown = l;
 }

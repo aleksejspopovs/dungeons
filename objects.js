@@ -2,23 +2,29 @@
 // 2010 no copyright -- mariofag
 // free software is our future
 
-function dungeonTile(tile, passable, monster, item) {
+function DungeonTile(tile, passable, monster, item) {
 	this.tile = tile;
 	this.pass = passable;
 	this.monster = monster;
 	this.item = item;
 	this.known = false;
 }
-function monster(id, type, lvl, mX, mY, dir) {
+function Monster(id, type, lvl, mX, mY, dir) {
 	this.id = id;
 	this.type = type;
 	this.lvl = lvl;
 	this.x = mX;
 	this.y = mY;
 	this.dir = dir;
-	this.hp = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin*3, monsterTypes[type].modMin*3);
-	this.attack = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
-	this.defence = this.lvl * (this.lvl+1) / 2 * rand(monsterTypes[type].modMin, monsterTypes[type].modMin);
+	this.maxHp = monsterTypes[type].hp;
+	this.attack = monsterTypes[type].att;
+	this.defence = monsterTypes[type].def;
+  for (var i = 2; i <= lvl; i++) {
+    this.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
+    this.attack = Math.round(player.attack * (1 + randHalf()));
+    this.defence = Math.round(player.defence * (1 + randHalf()));    
+  }
+  this.hp = this.maxHp;
 	this.name = monsterTypes[type].name;
   this.see = function (whom) {
     return ((Math.abs(this.x - whom.x) <= 9) && (Math.abs(this.y - whom.y) <= 9));
@@ -32,8 +38,7 @@ function monster(id, type, lvl, mX, mY, dir) {
 				var dir = rand(1,4);
         tries = 0;
 				while ((
-					((this.x + xOff[dir]) > LEVELSIZE) || ((this.x + xOff[dir]) < 1) || ((this.y + yOff[dir]) > LEVELSIZE) || ((this.y + yOff[dir]) < 1) || 
-					!dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster
+					!checkCoords(this.x + xOff[dir], this.y + yOff[dir]) || !dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster
 				) && tries < 5) { // 5 is here just for it to be easier to check whether monster found a way or not
 					dir = dir % 4 + 1;
           tries++;
@@ -41,7 +46,7 @@ function monster(id, type, lvl, mX, mY, dir) {
         if (tries == 5)
           step = null;
         else
-          step = new coords(this.x + xOff[dir], this.y + yOff[dir], dir);
+          step = new Coords(this.x + xOff[dir], this.y + yOff[dir], dir);
 			}
       if (step != null) {
         dungeon[this.x][this.y].monster = false;
@@ -54,14 +59,13 @@ function monster(id, type, lvl, mX, mY, dir) {
 	}
 	this.dead = function () {
 		dungeon[this.x][this.y].monster = 0;
-		player.xp += (player.lvl - this.lvl + 2) * rand(monsterTypes[this.type].modMin, monsterTypes[this.type].modMax);
-		while (player.xp >= ((player.lvl+1) * ((player.lvl) / 2) * LEVELMOD)) {
-			player.lvl++;
-			log(player.name+" has leveled up! His level is now "+player.lvl+".");
-			player.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
-			player.attack = Math.round(Math.random()*3+5) * player.lvl;
-			player.defence = Math.round(Math.random()*3+5) * player.lvl;
-		}
+    if ((this.lvl - player.lvl) > 0) {
+      player.xp += randH(2, 4) * (this.lvl - player.lvl);
+    } else {
+      player.xp += Math.ceil(0.5 * (player.lvl - this.lvl + 1));
+    }
+		while (player.xp >= player.toNextLvl)
+			player.levelUp();
 	}
 	this.findPath = function (tX, tY) {
 		var queue = new Array();
@@ -74,21 +78,21 @@ function monster(id, type, lvl, mX, mY, dir) {
 		var r = 1; // index of the queue element being read
 		var w = 2; // index of the first empty queue element
 		cost[tX][tY] = 0;
-		queue[1] = new coords(tX, tY, 0);
+		queue[1] = new Coords(tX, tY, 0);
 		while (r != w) {
 			curX = queue[r].x;
 			curY = queue[r].y;
 			for (i = 1; i <= 4; i++) {
 				mvX = curX + xOff[i];
 				mvY = curY + yOff[i];
-				if ((mvX <= 50) && (mvX >= 1) && (mvY <= 50) && (mvY >= 1) && 
+				if (checkCoords(mvX, mvY) && 
 						(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) && 
 						(!dungeon[mvX][mvY].monster || (mvX == this.x && mvY == this.y))) { // this.x;this.y is a monster obviously, so we should check for that
 					cost[mvX][mvY] = cost[curX][curY]+1;
-					queue[w] = new coords(mvX, mvY, 0);
+					queue[w] = new Coords(mvX, mvY, 0);
 					w++;
 					if ((mvX == this.x) && (mvY == this.y)) {
-						return new coords(curX, curY, (i == 1) ? 3 : (i == 2 ? 4 : (i == 3 ? 1 : 2)));
+						return new Coords(curX, curY, (i == 1) ? 3 : (i == 2 ? 4 : (i == 3 ? 1 : 2)));
 					}
 				}
 			}
@@ -97,15 +101,16 @@ function monster(id, type, lvl, mX, mY, dir) {
 		return false;
 	}
 }
-function monsterType(tile, name, desc, artist, modMin, modMax) {
+function MonsterType(tile, name, desc, artist, hp, att, def) {
 	this.tile = tile;
 	this.name = name;
 	this.desc = desc;
 	this.artist = artist;
-	this.modMin = modMin;
-	this.modMax = modMax;
+	this.hp = hp;
+  this.att = att;
+  this.def = def;
 }
-function playerO(name, image, x, y, dir) {
+function Player(name, image, x, y, dir) {
 	this.name = name;
 	this.image = image;
 	this.x = x;
@@ -113,21 +118,26 @@ function playerO(name, image, x, y, dir) {
 	this.dir = dir;
 	this.xp = 0;
 	this.lvl = 1;
+  this.toNextLvl = 20;
 	this.maxHp = 50;
 	this.hp = this.maxHp;
-	this.attack = Math.round(Math.random()*3+5);
-	this.defence = Math.round(Math.random()*3+5);
+	this.attack = 5;
+	this.defence = 5;
 	this.dead = function () {
 		this.hp = 0;
 		log("You're dead, GAME OVER.");
 		gameOver(false);
 	}
+  this.levelUp = function () {
+    player.lvl++;
+    log(player.name+" has leveled up! His level is now "+player.lvl+".");
+    player.toNextLvl += Math.round((player.lvl+3)*(player.lvl+2) / 2);
+    player.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
+    player.attack = Math.round(player.attack * (1 + randHalf()));
+    player.defence = Math.round(player.defence * (1 + randHalf()));
+  }
 }
-function item(type, subtype) {
-	this.type = type;
-	this.subtype = subtype;
-}
-function coords(x, y, dir) {
+function Coords(x, y, dir) {
 	this.x = x;
 	this.y = y;
 	this.dir = dir;

@@ -23,15 +23,103 @@ const MT_EXIT = 6;
 
 const T_EXIT = 3; // tiles
 
+const A_MOVE = 1; // actions
+const A_DIG = 2;
+const A_STAY = 3;
+const A_BUILD = 4;
+
 const xOff = new Array(0, 0, 1, 0, -1);
 const yOff = new Array(0, -1, 0, 1, 0);
 
 const music = new Array("8bit-slow.ogg", "Winged-tune.ogg");
 
 monsterTypes = new Array();
-monsterTypes[1] = new monsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 2, 3);
-monsterTypes[2] = new monsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 1, 2);
-monsterTypes[3] = new monsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 10, 10);
-monsterTypes[4] = new monsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 9, 9);
-monsterTypes[5] = new monsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 5, 6);
-monsterTypes[6] = new monsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 6, 7);
+// monsterTypes[i] = new MonsterType(tileName, monsterName, description, author, hp on 1st lvl, att on 1st lvl, def on 1st lvl);
+monsterTypes[1] = new MonsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 10, 4, 4);
+monsterTypes[2] = new MonsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 8, 3, 4);
+monsterTypes[3] = new MonsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 15, 5, 5);
+monsterTypes[4] = new MonsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 7, 3, 2);
+monsterTypes[5] = new MonsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 17, 6, 4);
+monsterTypes[6] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 3, 5);
+
+function init() {
+	if (browserCheck()) {
+		if (!window.localStorage.rows) window.localStorage.rows = 10;
+		document.getElementById('gamelog').rows = window.localStorage.rows;
+		document.getElementById('gamelog').value = "";
+		canvas = document.getElementById('game');
+		ctx = canvas.getContext('2d');
+		ctx.font = "16px sans-serif";
+		ctx.fillText("Please wait while all the necessary crap is loading...", 100, 210);
+		
+		mapTiles[MT_FLOOR] = ctx.createImageData(3,3); // floor
+		for (var i = 0; i <= 35; i++) mapTiles[MT_FLOOR].data[i] = 255;
+		mapTiles[MT_WALL] = ctx.createImageData(3,3); // wall
+		for (var i = 0; i <= 35; i++) mapTiles[MT_WALL].data[i] = !((i+1) % 4) ? 255 : 0;
+		mapTiles[MT_UNDEF] = ctx.createImageData(3,3); // undefined
+		for (var i = 0; i <= 35; i++) mapTiles[MT_UNDEF].data[i] = (i+1)%4 ? 228 : 255;
+		mapTiles[MT_PLAYER] = ctx.createImageData(3,3); // player
+		for (var i = 0; i <= 35; i++) mapTiles[MT_PLAYER].data[i] = i % 2 ? 255 : 0;
+		mapTiles[MT_MONSTER] = ctx.createImageData(3,3); // monster
+		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
+		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
+		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4 == 0) ? 0 : (i % 4 == 1) ? 127 : 255;		
+		
+		tTerrains[0] = new Image(); // Undefined (black)
+		tTerrains[0].src = './images/undefined.png';
+		tTerrains[0].onload = resLoad;
+		tTerrains[1] = new Image(); // Floor
+		tTerrains[1].src = './images/floor.png';
+		tTerrains[1].onload = resLoad;
+		tTerrains[2] = new Image(); // Wall
+		tTerrains[2].src = './images/wall.png';
+		tTerrains[2].onload = resLoad;
+		tTerrains[3] = new Image(); // Exit
+		tTerrains[3].src = './images/exit.png';
+		tTerrains[3].onload = resLoad;
+		tTerrains[4] = new Image(); // Wall corner
+		tTerrains[4].src = './images/wall_corner.png';
+		tTerrains[4].onload = resLoad;
+		
+		tPlayer[D_UP] = new Image(); // Player facing up
+		tPlayer[D_UP].src = './images/'+player.image+'/up.png';
+		tPlayer[D_UP].onload = resLoad;
+		tPlayer[D_RIGHT] = new Image(); // Player facing right
+		tPlayer[D_RIGHT].src = './images/'+player.image+'/right.png';
+		tPlayer[D_RIGHT].onload = resLoad;
+		tPlayer[D_DOWN] = new Image(); // Player facing down
+		tPlayer[D_DOWN].src = './images/'+player.image+'/down.png';
+		tPlayer[D_DOWN].onload = resLoad;
+		tPlayer[D_LEFT] = new Image(); // Player facing left
+		tPlayer[D_LEFT].src = './images/'+player.image+'/left.png';
+		tPlayer[D_LEFT].onload = resLoad;
+		
+		tMonsters = new Array();
+		for (var i = 1; i < monsterTypes.length; i++) {
+			tMonsters[i] = new Array();
+			tMonsters[i][D_UP] = new Image();
+			tMonsters[i][D_UP].src = './images/monsters/'+monsterTypes[i].tile+'_up.png'; 
+			tMonsters[i][D_UP].onload = resLoad;
+			tMonsters[i][D_RIGHT] = new Image();
+			tMonsters[i][D_RIGHT].src = './images/monsters/'+monsterTypes[i].tile+'_right.png';
+			tMonsters[i][D_RIGHT].onload = resLoad;
+			tMonsters[i][D_DOWN] = new Image();
+			tMonsters[i][D_DOWN].src = './images/monsters/'+monsterTypes[i].tile+'_down.png';
+			tMonsters[i][D_DOWN].onload = resLoad;
+			tMonsters[i][D_LEFT] = new Image();
+			tMonsters[i][D_LEFT].src = './images/monsters/'+monsterTypes[i].tile+'_left.png';
+			tMonsters[i][D_LEFT].onload = resLoad;
+			toLoad += 4;
+		}
+		
+		bgm = new Audio("./music/"+music[rand(0, music.length-1)]);
+		bgm.loop = true;
+		if (!window.localStorage.bgm) window.localStorage.bgm = "off";
+		document.getElementById("bgmButton").value = "music: "+window.localStorage.bgm;
+		if (window.localStorage.bgm == "on") // erm... damn localStorage only works with strings, no booleans :(
+			bgm.play();
+		else
+			bgm.pause();
+		
+	} else alert("it seems that your browser is busy sucking cocks so it can't display this awesome game for you");
+}
