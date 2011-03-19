@@ -157,10 +157,12 @@ function turn(event) {
 			nY++;
 		break;
     case 0x44: // _d_ig
+    case 0x64:
       action = A_DIG;
       event.preventDefault();
     break;
     case 0x53: // s ('cause it's near d) — build
+    case 0x73:
       action = A_BUILD;
       event.preventDefault();
     break;
