@@ -1,0 +1,14 @@
+Welcome to dungeons project page!
+
+Dungeons is a 2d roguelike game (or maybe even a game engine) using HTML5 <canvas> & JavaScript.
+Even though it's current features are kind of limited, I'm going to make great efforts in developing it further.
+Right now, it's future is quite uncertain. Here are some thoughts on what it might become:
+1. a simple roguelike game
+2. a fully-fledged RPG with a storyline
+3. a 2d MMO :3
+
+Dungeons is free software, provided under the MIT license (more info in LICENSE file). I would be really happy to see other developers pick up dungeons and make some cool things with it.
+
+Thank you for taking your time to read this.
+Alexey "popoffka"/"mariofag" Popov,
+the developer of dungeons
