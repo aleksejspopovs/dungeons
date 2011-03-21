@@ -68,6 +68,7 @@ function Dungeon(level) {
 			dun[w.x][w.y].pass = true;
 		}
 	}	
+  
 	var tree = new Array();
 	tree[1] = new TreeGrid(1, 1, 50, 50);
 	
@@ -92,7 +93,7 @@ function Dungeon(level) {
 		for (var j=0; j <= 51; j++) {
 			this[i][j] = new DungeonTile(2, false, 0);
 		}
-	}	
+	}
 	
 	for (var i = 16; i <= 31; i++) 
     diffFill(this, tree[i]);
@@ -116,17 +117,14 @@ function Dungeon(level) {
 			j++;
 		}
 	}
-	i = rand(16, 31); // placing exit
-	if (i == playerCell || this[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster) { // if there's a monster/player in the centre of that room
-		do {
-			var x = rand(tree[i].startX, tree[i].endX);
-			var y = rand(tree[i].startY, tree[i].endY);
-		} while ((!this[x][y].pass) || (this[x][y].monster));
-		this[x][y] = new DungeonTile(T_EXIT, false, 0, 0)
-	} else { // if there's no monster
-		this[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].tile = T_EXIT;
-		this[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].pass = false;
-	}
+	do { // placing exit 
+    i = rand(16, 31); 
+  } while (i == playerCell);
+  w = new Walker(this, Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2));
+  while (this[w.x][w.y].pass) {
+    w.moveTo(rand(1, 4), 0, 4, 1, 50, 1, 50, false);
+  }
+  this[w.x][w.y].tile = T_EXIT;
 	for (i=1; i<=50; i++) {
 		for (j=1; j<=50; j++) {
 			if (this[i][j].tile == 2 && (this[i][j+1] == undefined || this[i][j+1].tile != 2)) {
