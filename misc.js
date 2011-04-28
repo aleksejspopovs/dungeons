@@ -1,5 +1,5 @@
-// misc roguelike code
-// 2010 no copyright -- mariofag
+// misc dungeons code
+// this software is available under MIT License, see LICENSE for more info
 // free software is our future
 
 
@@ -116,4 +116,8 @@ function setKeyListener(l) {
     document.onkeypress = l;
   else 
     document.onkeydown = l;
+}
+
+function itemCompare(a, b) {
+  return items[a].name > items[b].name;
 }

@@ -1,5 +1,5 @@
-// constant definitions
-// 2010 no copyright -- mariofag
+// constant definitions for dungeons
+// this software is available under MIT License, see LICENSE for more info
 // free software is our future
 
 /* CONST */
@@ -14,7 +14,7 @@ const D_DOWN = 3;
 const D_RIGHT = 2;
 const D_LEFT = 4;
 
-const MT_FLOOR = 1; // These are minimap tile IDs
+const MT_FLOOR = 1; // minimap tile IDs
 const MT_WALL = 2;
 const MT_UNDEF = 3;
 const MT_PLAYER = 4;
@@ -27,6 +27,14 @@ const A_MOVE = 1; // actions
 const A_DIG = 2;
 const A_STAY = 3;
 const A_BUILD = 4;
+const A_INVENTORY = 5;
+
+const S_HEAD = 1; // slots
+const S_LEGS = 2;
+const S_ARMS = 3;
+const S_BODY = 4;
+const S_LEFTHAND = 5;
+const S_RIGHTHAND = 6;
 
 const xOff = new Array(0, 0, 1, 0, -1);
 const yOff = new Array(0, -1, 0, 1, 0);
@@ -41,6 +49,15 @@ monsterTypes[3] = new MonsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "D
 monsterTypes[4] = new MonsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 7, 3, 2);
 monsterTypes[5] = new MonsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 17, 6, 4);
 monsterTypes[6] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 3, 5);
+
+items = new Array();
+items[1] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); });
+items[2] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; });
+items[3] = new ItemArmor("Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
+items[4] = new ItemArmor("McDonalds Bag", "Yeah, I know you wear one already. But you know, one is never enoguh.", S_HEAD, 2);
+items[5] = new ItemArmor("Aperture Science Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
+items[6] = new ItemWeapon("Towel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
+
 
 function init() {
 	if (browserCheck()) {

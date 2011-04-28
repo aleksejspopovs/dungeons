@@ -1,5 +1,5 @@
-// roguelike dungeon generating code
-// 2010 no copyright -- mariofag
+// dungeon generating code for dungeons
+// this software is available under MIT License, see LICENSE for more info
 // free software is our future
 
 function Dungeon(level) {

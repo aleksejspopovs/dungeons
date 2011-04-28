@@ -1,5 +1,5 @@
-// roguelike object declaring code
-// 2010 no copyright -- mariofag
+// object declaring code for dungeons
+// this software is available under MIT License, see LICENSE for more info
 // free software is our future
 
 function DungeonTile(tile, passable, monster, item) {
@@ -26,10 +26,16 @@ function Monster(id, type, lvl, mX, mY, dir) {
   }
   this.hp = this.maxHp;
 	this.name = monsterTypes[type].name;
-  this.see = function (whom) {
+  this.getAtt = function () {
+    return this.attack;
+  }
+  this.getDef = function () {
+    return this.defence;
+  }
+  this.see = function (whom) { // checks whether a monster can see someone or not
     return ((Math.abs(this.x - whom.x) <= 9) && (Math.abs(this.y - whom.y) <= 9));
   }
-	this.takeTurn = function () {
+	this.takeTurn = function () { // AI
 		if (Math.abs(this.x - player.x) + Math.abs(this.y - player.y) == 1) {
 			attack(this, player); // if player is near, attack him
 		} else {
@@ -67,7 +73,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 		while (player.xp >= player.toNextLvl)
 			player.levelUp();
 	}
-	this.findPath = function (tX, tY) {
+	this.findPath = function (tX, tY) { // finds a Coords object that is the first step on path to (tX,tY) (or false if there's no such path)
 		var queue = new Array();
 		var cost = new Array();
 		for (var i = 1; i <= 50; i++) {
@@ -123,12 +129,25 @@ function Player(name, image, x, y, dir) {
 	this.hp = this.maxHp;
 	this.attack = 5;
 	this.defence = 5;
-	this.dead = function () {
+  this.attBonus = 0;
+  this.defBonus = 0;
+  this.getAtt = function () {
+    return this.attack + this.attBonus;
+  }
+  this.getDef = function () {
+    return this.defence + this.defBonus;
+  }
+	this.dead = function () { // tells player he's dead and finishes the game
 		this.hp = 0;
 		log("You're dead, GAME OVER.");
 		gameOver(false);
 	}
-  this.levelUp = function () {
+  this.addHp = function (n) { // adds n HP to the player
+    this.hp += n;
+    if (this.hp > this.maxHp)
+      this.hp = this.maxHp;
+  }
+  this.levelUp = function () { // levels up the player
     player.lvl++;
     log(player.name+" has leveled up! His level is now "+player.lvl+".");
     player.toNextLvl += Math.round((player.lvl+3)*(player.lvl+2) / 2);
@@ -136,9 +155,42 @@ function Player(name, image, x, y, dir) {
     player.attack = Math.round(player.attack * (1 + randHalf()));
     player.defence = Math.round(player.defence * (1 + randHalf()));
   }
+  this.inventory = new Array();
+  this.giveItem = function (item) {
+    this.inventory = this.inventory.concat([item]);
+    this.inventory.sort(itemCompare);
+  }
 }
 function Coords(x, y, dir) {
 	this.x = x;
 	this.y = y;
 	this.dir = dir;
+}
+function ItemAction(name, desc, use) {
+  this.name = name;
+  this.desc = desc;
+  this.use = use; // is a function that should be passed a Player object
+}
+function ItemArmor(name, desc, slot, bonus) {
+  this.name = name;
+  this.desc = desc;
+  this.slot = slot;
+  this.bouns = bonus;
+  this.wear = function (player) {
+    player.defBonus += this.bonus;
+  }
+  this.unWear = function () {
+    player.defBonus -= this.bonus;
+  }
+}
+function ItemWeapon(name, desc, bonus) {
+  this.name = name;
+  this.desc = desc;
+  this.bouns = bonus;
+  this.wear = function (player) {
+    player.attBonus += this.bonus;
+  }
+  this.unWear = function () {
+    player.attBonus -= this.bonus;
+  }
 }

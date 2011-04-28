@@ -1,12 +1,13 @@
-// main roguelike logic
-// 2010 no copyright -- mariofag
+// main logic for dungeons
+// this software is available under MIT License, see LICENSE for more info
 // free software is our future
+
 var dungeon, temp, bgm;
 var loaded = 0;
 var toLoad = 9;
 var intervalId = 0;
 var errorCount = 0;
-var exitChoice = 1;
+var choice = 1;
 
 player = new Player("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
@@ -22,8 +23,6 @@ function resLoad() {
 		setTimeout(function () {newGame(1); }, 125);
 	}
 }
-
-
 
 function newGame(level) {
 	if (level == 1) player = new Player("Anonymous", "bag", 25, 25, 4);
@@ -73,8 +72,8 @@ function draw() {
 	ctx.fillText(getFloorString(dungeon.level)+" floor", 747, 26);
 	ctx.fillText(player.hp+"/"+player.maxHp+" HP", 682, 47);
 	ctx.fillText(player.xp+"/"+player.toNextLvl+" XP", 682, 67);
-	ctx.fillText("ATT: "+player.attack, 682, 78);
-	ctx.fillText("DEF: "+player.defence, 747, 78);
+	ctx.fillText("ATT: "+player.getAtt(), 682, 78);
+	ctx.fillText("DEF: "+player.getDef(), 747, 78);
 	ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 105);
 	
 	for (i = 1; i <= 50; i++) {
@@ -106,8 +105,8 @@ function attack(att, def) {
 			def.dir = 2;
 		break;
 	}
-	if (Math.random() > (att.attack - def.defence) / (2*(att.attack + def.defence))) {
-		var damage = Math.round(def.maxHp * ((randH(1, 3) * att.attack) / (10 * att.attack)));
+	if (Math.random() > (att.getAtt() - def.getDef()) / (2*(att.getAtt() + def.getDef()))) {
+		var damage = Math.round(def.maxHp * ((randH(1, 3) * att.getAtt()) / (10 * att.getAtt())));
 		def.hp -= damage;
 		log(att.name+' has attacked '+def.name+' and done '+damage+' points of damage.');
 	} else {
@@ -156,14 +155,19 @@ function turn(event) {
 			event.preventDefault();
 			nY++;
 		break;
-    case 0x44: // _d_ig
+    case 0x44: // d for Dig
     case 0x64:
       action = A_DIG;
       event.preventDefault();
     break;
-    case 0x53: // s ('cause it's near d) — build
+    case 0x53: // s for build
     case 0x73:
       action = A_BUILD;
+      event.preventDefault();
+    break;
+    case 0x49: // i for Inventory
+    case 0x69:
+      action = A_INVENTORY;
       event.preventDefault();
     break;
 		case 0x0D:
@@ -233,23 +237,54 @@ function turn(event) {
       if (player.hp > player.maxHp) player.hp = player.maxHp;
       monstersTakeTurns();
     break;
+    case A_INVENTORY:
+      setKeyListener(inventoryKeyHandler);
+      choice = 0;
+      drawInventory();
+      dontRedraw = true;
+    break;
   }
   if (!dontRedraw)
     draw();
 }
 
+function inventoryKeyHandler(e) {
+  switch (e.keyCode) {
+    case 0x1B:  // ESC
+      setKeyListener(turn);
+      draw();
+    break;
+  }
+}
+
+function drawInventory() {
+  ctx.fillStyle = 'black';
+  ctx.fillRect(10, 10, 652, 460);
+  ctx.fillStyle = 'white';
+  ctx.textAlign = "center";
+  ctx.font = "16pt '04b03r'";
+  ctx.fillText("Inventory", 336, 40);
+  ctx.font = "12pt '04b03r'";
+  ctx.textAlign = "left";
+  
+}
+
 function levelExitKeyHandler(e) {
 	switch (e.keyCode) {
 		case 0x26:
-			if (exitChoice > 1) exitChoice--;
+			if (choice > 1) choice--;
 			e.preventDefault();
 		break;
 		case 0x28:
-			if (exitChoice < 3) exitChoice++;
+			if (choice < 3) choice++;
 			e.preventDefault();
 		break;
+    case 0x1B:  // ESC
+      setKeyListener(turn);
+      draw();
+    break;
 		case 0x0D:
-			switch (exitChoice) {
+			switch (choice) {
 				case 1:
 					setKeyListener(turn);
 					draw();
@@ -264,30 +299,30 @@ function levelExitKeyHandler(e) {
 			}
 		break;
 	}
-	if (e.keyCode != 0x0D) levelExit(false);
+	if (e.keyCode != 0x0D && e.keyCode != 0x1B) levelExit(false);
 }
 
 function levelExit(full) {
 	if (full) {
 		setKeyListener(levelExitKeyHandler);
-		exitChoice = 1;
+		choice = 1;
 		ctx.fillStyle = 'black';
-		ctx.fillRect(0, 0, 672, 480);
+		ctx.fillRect(10, 10, 652, 460);
 		ctx.fillStyle = 'white';
 		ctx.textAlign = "center";
 		ctx.font = "32pt '04b03r'";
 		ctx.fillText("Escape dungeon", 336, 50);
 		ctx.font = "12pt '04b03r'";
 		ctx.textAlign = "left";
-		ctx.fillText("What do you want to do?", 10, 90);
+		ctx.fillText("What do you want to do?", 20, 90);
 	}
 	ctx.font = "12pt '04b03r'";
 	ctx.fillStyle = 'black';
-	ctx.fillRect(450, 75, 222, 65);	
+	ctx.fillRect(450, 75, 200, 65);	
 	ctx.textAlign = "left";
 	ctx.fillStyle = 'white';
-	ctx.fillText("Stay", 662-ctx.measureText("Shop and leave").width, 90);
-	ctx.fillText("Leave", 662-ctx.measureText("Shop and leave").width, 110);
-	ctx.fillText("Shop and leave", 662-ctx.measureText("Shop and leave").width, 130);
-	ctx.fillText(">", 662-ctx.measureText("Shop and leave").width-10, 70 + 20*exitChoice);
+	ctx.fillText("Stay", 652-ctx.measureText("Shop and leave").width, 90);
+	ctx.fillText("Leave", 652-ctx.measureText("Shop and leave").width, 110);
+	ctx.fillText("Shop and leave", 652-ctx.measureText("Shop and leave").width, 130);
+	ctx.fillText(">", 652-ctx.measureText("Shop and leave").width-10, 70 + 20*choice);
 }
