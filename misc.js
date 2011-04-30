@@ -119,5 +119,5 @@ function setKeyListener(l) {
 }
 
 function itemCompare(a, b) {
-  return items[a].name > items[b].name;
+  return ((a == undefined) || (items[a].name > items[b].name));
 }

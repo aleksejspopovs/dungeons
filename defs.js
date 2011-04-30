@@ -36,6 +36,8 @@ const S_BODY = 4;
 const S_LEFTHAND = 5;
 const S_RIGHTHAND = 6;
 
+const ITEMS_PER_PAGE = 15;
+
 const xOff = new Array(0, 0, 1, 0, -1);
 const yOff = new Array(0, -1, 0, 1, 0);
 
@@ -54,9 +56,9 @@ items = new Array();
 items[1] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); });
 items[2] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; });
 items[3] = new ItemArmor("Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
-items[4] = new ItemArmor("McDonalds Bag", "Yeah, I know you wear one already. But you know, one is never enoguh.", S_HEAD, 2);
+items[4] = new ItemArmor("McDonalds Bag", "Yeah, I know you are wearing one already. But you know, one is never enoguh.", S_HEAD, 2);
 items[5] = new ItemArmor("Aperture Science Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
-items[6] = new ItemWeapon("Towel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
+items[6] = new ItemWeapon("Showel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
 
 
 function init() {

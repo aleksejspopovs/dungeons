@@ -155,11 +155,21 @@ function Player(name, image, x, y, dir) {
     player.attack = Math.round(player.attack * (1 + randHalf()));
     player.defence = Math.round(player.defence * (1 + randHalf()));
   }
-  this.inventory = new Array();
+  this.inventory = new Array(undefined);
   this.giveItem = function (item) {
     this.inventory = this.inventory.concat([item]);
     this.inventory.sort(itemCompare);
+    this.inventory.pop();
+    this.inventory = [undefined].concat(this.inventory); // sorry for this dirty hack,
+                                                         // I just love 1-based arrays sooo much <3
   }
+  this.deleteItem = function (item) {
+		delete this.inventory[item];
+		this.inventory.sort(itemCompare);
+		this.inventory.pop();
+		this.inventory = [undefined].concat(this.inventory);
+	}
+	this.хуйня = new Array(); // sorry, couldn't find another way to call all the stuff that player's wearing
 }
 function Coords(x, y, dir) {
 	this.x = x;
@@ -175,22 +185,22 @@ function ItemArmor(name, desc, slot, bonus) {
   this.name = name;
   this.desc = desc;
   this.slot = slot;
-  this.bouns = bonus;
+  this.bonus = bonus;
   this.wear = function (player) {
     player.defBonus += this.bonus;
   }
-  this.unWear = function () {
+  this.unWear = function (player) {
     player.defBonus -= this.bonus;
   }
 }
 function ItemWeapon(name, desc, bonus) {
   this.name = name;
   this.desc = desc;
-  this.bouns = bonus;
+  this.bonus = bonus;
   this.wear = function (player) {
     player.attBonus += this.bonus;
   }
-  this.unWear = function () {
+  this.unWear = function (player) {
     player.attBonus -= this.bonus;
   }
 }

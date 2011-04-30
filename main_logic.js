@@ -7,7 +7,7 @@ var loaded = 0;
 var toLoad = 9;
 var intervalId = 0;
 var errorCount = 0;
-var choice = 1;
+var choice = 1, pageStart = 1; // for menus
 
 player = new Player("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
@@ -238,8 +238,9 @@ function turn(event) {
       monstersTakeTurns();
     break;
     case A_INVENTORY:
+			choice = 1;
+			pageStart = 1;
       setKeyListener(inventoryKeyHandler);
-      choice = 0;
       drawInventory();
       dontRedraw = true;
     break;
@@ -250,10 +251,35 @@ function turn(event) {
 
 function inventoryKeyHandler(e) {
   switch (e.keyCode) {
+		case 0x26:
+			if (choice > 1) choice--;
+			if (choice < pageStart) pageStart--;
+			e.preventDefault();
+			drawInventory();
+		break;
+		case 0x28:
+			if (choice < player.inventory.length-1) choice++;
+			if (choice > (pageStart + ITEMS_PER_PAGE - 1)) pageStart++;
+			e.preventDefault();
+			drawInventory();
+		break;
     case 0x1B:  // ESC
       setKeyListener(turn);
       draw();
     break;
+		case 0x0D: // enter
+			if (items[player.inventory[choice]].__proto__.constructor.name == "ItemAction") {
+				items[player.inventory[choice]].use(player);
+				player.deleteItem(choice);
+			} else {
+				if (player.хуйня[items[player.inventory[choice].slot]] != undefined) {
+					alert("there's already something equipped in this slot");
+				} else {
+					player.хуйня[items[player.inventory[choice].slot]] = choice;
+					items[player.inventory[choice]].wear(player);
+				}
+			}
+		break;
   }
 }
 
@@ -266,7 +292,21 @@ function drawInventory() {
   ctx.fillText("Inventory", 336, 40);
   ctx.font = "12pt '04b03r'";
   ctx.textAlign = "left";
-  
+  ctx.strokeStyle = "white";
+  ctx.strokeRect(15, 50, 642, 275); // item list
+  ctx.strokeRect(15, 335, 642, 130); // cur item desc
+  if (player.inventory.length == 1) {
+		ctx.fillText("Sorry, but it seems you haven't got any items in your inventory :(", 30, 65);
+	} else {
+		for (var i=pageStart; i < Math.min(player.inventory.length, pageStart + ITEMS_PER_PAGE); i++) {
+			if (player.хуйня[items[player.inventory[i]].slot] == i)
+				ctx.fillStyle = "yellow";
+			else
+				ctx.fillStyle = "white";
+			ctx.fillText(items[player.inventory[i]].name, 30, 65 + 18*(i-pageStart));
+		}
+		ctx.fillText(">", 20, 65 + 18 * (choice - pageStart));
+	}
 }
 
 function levelExitKeyHandler(e) {
