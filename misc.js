@@ -118,6 +118,6 @@ function setKeyListener(l) {
     document.onkeydown = l;
 }
 
-function itemCompare(a, b) {
-  return ((a == undefined) || (items[a].name > items[b].name));
+function itemRecordCompare(a, b) {
+  return ((a.itemId == undefined) || (items[a.itemId].name > items[b.itemId].name));
 }
