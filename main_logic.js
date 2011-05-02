@@ -29,14 +29,16 @@ function newGame(level) {
 	monsters = new Array();
 	dungeon = new Dungeon(level);
 	temp = 1;
-	draw(); 
+	drawSidebar();
+	drawMap(); 
 	setKeyListener(turn);
 	log(player.name+" has entered the dungeon's "+getFloorString(level)+" floor.");
 }
 
 function attack(att, def) {
 	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
-	switch (att.dir) {
+	def.dir = ((att.dir + 2) % 4 == 0) ? 4 : (att.dir + 2) % 4;
+	/*switch (att.dir) {
 		case 1: 
 			def.dir = 3;
 		break; 
@@ -49,7 +51,7 @@ function attack(att, def) {
 		case 4:
 			def.dir = 2;
 		break;
-	}
+	}*/
 	if (Math.random() > (att.getAtt() - def.getDef()) / (2*(att.getAtt() + def.getDef()))) {
 		var damage = Math.round(def.maxHp * ((randH(1, 3) * att.getAtt()) / (10 * att.getAtt())));
 		def.hp -= damage;
@@ -147,8 +149,7 @@ function turn(event) {
         levelExit(true);
         dontRedraw = true;
       }
-
-    break;
+    break
     case A_DIG:
       if (checkCoords(nX+xOff[player.dir], nY+yOff[player.dir]) && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].monster && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile != T_EXIT) {
         dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass = true;
@@ -190,8 +191,10 @@ function turn(event) {
       dontRedraw = true;
     break;
   }
-  if (!dontRedraw)
-    draw();
+  if (!dontRedraw) {
+    drawMap();
+    drawSidebar();
+  }
 }
 
 function inventoryKeyHandler(e) {
@@ -210,23 +213,26 @@ function inventoryKeyHandler(e) {
 		break;
     case 0x1B:  // ESC
       setKeyListener(turn);
-      draw();
+      drawMap();
     break;
 		case 0x0D: // enter
 			if (items[player.inventory[choice].itemId].__proto__.constructor.name == "ItemAction") {
 				items[player.inventory[choice].itemId].use(player);
+				drawSidebar();
 				player.deleteItem(choice);
 			} else {
 				if (player.хуйня[items[player.inventory[choice].itemId].slot] != undefined) {
 					if (player.хуйня[items[player.inventory[choice].itemId].slot] == player.inventory[choice].inventoryId) {
 						player.хуйня[items[player.inventory[choice].itemId].slot] = undefined;
 						items[player.inventory[choice].itemId].unWear(player);
+						monstersTakeTurns();
 					} else { 
 						alert("there's already something equipped in this slot");
 					}
 				} else {
 					player.хуйня[items[player.inventory[choice].itemId].slot] = player.inventory[choice].inventoryId;
 					items[player.inventory[choice].itemId].wear(player);
+					monstersTakeTurns();
 				}
 			}
 			drawInventory();
@@ -246,13 +252,15 @@ function levelExitKeyHandler(e) {
 		break;
     case 0x1B:  // ESC
       setKeyListener(turn);
-      draw();
+      drawMap();
+      drawSidebar();
     break;
 		case 0x0D:
 			switch (choice) {
 				case 1:
 					setKeyListener(turn);
-					draw();
+					drawMap();
+					drawSidebar();
 				break;
 				case 2:
 					log(player.name + " has decided to get deeper into this dungeon.");

@@ -116,6 +116,11 @@ function MonsterType(tile, name, desc, artist, hp, att, def) {
   this.att = att;
   this.def = def;
 }
+function itemRecord(itemId, inventoryId) {
+	this.itemId = itemId;
+	this.inventoryId = inventoryId;
+}
+
 function Player(name, image, x, y, dir) {
 	this.name = name;
 	this.image = image;
@@ -156,17 +161,18 @@ function Player(name, image, x, y, dir) {
     player.defence = Math.round(player.defence * (1 + randHalf()));
   }
   this.inventory = new Array(undefined);
+ 	this.lastInventoryId = 0;
   this.giveItem = function (item) {
-    this.inventory = this.inventory.concat([item]);
-    this.inventory.sort(itemCompare);
+    this.inventory = this.inventory.concat([new itemRecord(item, ++this.lastInventoryId)]);
+    this.inventory.sort(itemRecordCompare);
     this.inventory.pop();
     this.inventory = [undefined].concat(this.inventory); // sorry for this dirty hack,
                                                          // I just love 1-based arrays sooo much <3
   }
   this.deleteItem = function (item) {
 		delete this.inventory[item];
-		this.inventory.sort(itemCompare);
-		this.inventory.pop();
+		this.inventory.sort(itemRecordCompare);
+		this.inventory.pop(); this.inventory.pop();
 		this.inventory = [undefined].concat(this.inventory);
 	}
 	this.хуйня = new Array(); // sorry, couldn't find another way to call all the stuff that player's wearing

@@ -27,9 +27,25 @@ function drawInventory() {
 		ctx.fillStyle = "white";
 		ctx.fillText(">", 20, 65 + 18 * (choice - pageStart));
 	}
+	
+	  if (player.inventory.length > 1) {
+			// writing an item's description
+			words = items[player.inventory[choice].itemId].desc.split(" ");
+			i = 1;
+			line = 0;
+			cur = words[0];
+			while (i <= words.length-1) {
+				while ((i <= words.length-1) && (ctx.measureText(cur + " " + words[i]).width <= 622))
+					cur += " " + words[i++];
+				ctx.fillText(cur, 20, 350 + line*18);
+				cur = "";
+				line++;
+			}	
+		}
 }
 
 function drawSidebar() {
+	ctx.textAlign = "left";
 	ctx.fillStyle = 'gray';
 	ctx.fillRect(672, 0, 822, 480);
 
@@ -80,11 +96,6 @@ function drawMap() {
 		}
 	}
 	ctx.drawImage(tPlayer[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);
-}
-
-function draw() { // dirty hack for compatibility, will have to replace that later
-	drawMap();
-	drawSidebar();
 }
 
 function levelExit(full) {
