@@ -116,9 +116,12 @@ function MonsterType(tile, name, desc, artist, hp, att, def) {
   this.att = att;
   this.def = def;
 }
-function itemRecord(itemId, inventoryId) {
+function itemRecord(itemId, inventoryId, count) {
+  if (count == undefined)
+    count = 1;
 	this.itemId = itemId;
 	this.inventoryId = inventoryId;
+  this.count = count;
 }
 
 function Player(name, image, x, y, dir) {
@@ -163,17 +166,31 @@ function Player(name, image, x, y, dir) {
   this.inventory = new Array(undefined);
  	this.lastInventoryId = 0;
   this.giveItem = function (item) {
-    this.inventory = this.inventory.concat([new itemRecord(item, ++this.lastInventoryId)]);
-    this.inventory.sort(itemRecordCompare);
-    this.inventory.pop();
-    this.inventory = [undefined].concat(this.inventory); // sorry for this dirty hack,
-                                                         // I just love 1-based arrays sooo much <3
+    found = false;
+    for (var i=1; i<this.inventory.length; i++) {
+      if (this.inventory[i].itemId == item) {
+        found = i;
+        break;
+      }
+    }
+    if (!found) {
+      this.inventory = this.inventory.concat([new itemRecord(item, ++this.lastInventoryId)]);
+      this.inventory.sort(itemRecordCompare);
+      this.inventory.pop();
+      this.inventory = [undefined].concat(this.inventory); // sorry for this dirty hack,
+                                                           // I just love 1-based arrays sooo much <3
+    } else {
+      this.inventory[found].count++;
+    }
   }
   this.deleteItem = function (item) {
-		delete this.inventory[item];
-		this.inventory.sort(itemRecordCompare);
-		this.inventory.pop(); this.inventory.pop();
-		this.inventory = [undefined].concat(this.inventory);
+    this.inventory[item].count--;
+    if (this.inventory[item].count < 1) {
+      delete this.inventory[item];
+      this.inventory.sort(itemRecordCompare);
+      this.inventory.pop(); this.inventory.pop(); // remove two undefined objects (one was made after deleting, the other was a hack)
+      this.inventory = [undefined].concat(this.inventory);
+    }
 	}
 	this.хуйня = new Array(); // sorry, couldn't find another way to call all the stuff that player's wearing
 }

@@ -18,30 +18,34 @@ function drawInventory() {
 		ctx.fillText("Sorry, but it seems you haven't got any items in your inventory :(", 30, 65);
 	} else {
 		for (var i=pageStart; i < Math.min(player.inventory.length, pageStart + ITEMS_PER_PAGE); i++) {
+      ctx.textAlign = "left";
 			if (player.хуйня[items[player.inventory[i].itemId].slot] == player.inventory[i].inventoryId)
 				ctx.fillStyle = "yellow";
 			else
 				ctx.fillStyle = "white";
 			ctx.fillText(items[player.inventory[i].itemId].name, 30, 65 + 18*(i-pageStart));
+      ctx.textAlign = "right";
+			ctx.fillText(player.inventory[i].count, 647, 65 + 18*(i-pageStart));
 		}
 		ctx.fillStyle = "white";
+    ctx.textAlign = "left";
 		ctx.fillText(">", 20, 65 + 18 * (choice - pageStart));
 	}
 	
-	  if (player.inventory.length > 1) {
-			// writing an item's description
-			words = items[player.inventory[choice].itemId].desc.split(" ");
-			i = 1;
-			line = 0;
-			cur = words[0];
-			while (i <= words.length-1) {
-				while ((i <= words.length-1) && (ctx.measureText(cur + " " + words[i]).width <= 622))
-					cur += " " + words[i++];
-				ctx.fillText(cur, 20, 350 + line*18);
-				cur = "";
-				line++;
-			}	
-		}
+  if (player.inventory.length > 1) {
+    // writing an item's description
+    words = items[player.inventory[choice].itemId].desc.split(" ");
+    i = 1;
+    line = 0;
+    cur = words[0];
+    while (i <= words.length-1) {
+      while ((i <= words.length-1) && (ctx.measureText(cur + " " + words[i]).width <= 622))
+        cur += " " + words[i++];
+      ctx.fillText(cur, 20, 350 + line*18);
+      cur = "";
+      line++;
+    }	
+  }
 }
 
 function drawSidebar() {
