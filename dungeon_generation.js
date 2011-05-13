@@ -112,7 +112,7 @@ function Dungeon(level) {
 	j = 1;
 	for (var i = rand(16,18); i <= 31; i += rand(1,3)) { // placing monsters
 		if (i != playerCell) {
-			monsters[j] = new Monster(j, rand(1, monsterTypes.length-1), rand(level == 1 ? 1 : level - 1, level + 1), Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
+			monsters[j] = new Monster(j, rand(0, monsterTypes.length-1), rand(level == 1 ? 1 : level - 1, level + 1), Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
 			this[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster = j;
 			j++;
 		}

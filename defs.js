@@ -45,20 +45,20 @@ const music = new Array("8bit-slow.ogg", "Winged-tune.ogg");
 
 monsterTypes = new Array();
 // monsterTypes[i] = new MonsterType(tileName, monsterName, description, author, hp on 1st lvl, att on 1st lvl, def on 1st lvl);
-monsterTypes[1] = new MonsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 10, 4, 4);
-monsterTypes[2] = new MonsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 8, 3, 4);
-monsterTypes[3] = new MonsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 15, 5, 5);
-monsterTypes[4] = new MonsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 7, 3, 2);
-monsterTypes[5] = new MonsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 17, 6, 4);
-monsterTypes[6] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 3, 5);
+monsterTypes[0] = new MonsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 10, 4, 4);
+monsterTypes[1] = new MonsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 8, 3, 4);
+monsterTypes[2] = new MonsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 15, 5, 5);
+monsterTypes[3] = new MonsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 7, 3, 2);
+monsterTypes[4] = new MonsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 17, 6, 4);
+monsterTypes[5] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 3, 5);
 
 items = new Array();
-items[1] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); });
-items[2] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; });
-items[3] = new ItemArmor("Cat ears", "Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
-items[4] = new ItemArmor("McDonalds Bag", "McDonalds Bag", "Yeah, I know you are wearing one already. But you know, one is never enough.", S_HEAD, 2);
-items[5] = new ItemArmor("Aperture Science Long Fall Boots", "AS Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
-items[6] = new ItemWeapon("Showel", "Showel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
+items[0] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); });
+items[1] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; });
+items[2] = new ItemArmor("Cat ears", "Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
+items[3] = new ItemArmor("McDonalds Bag", "McDonalds Bag", "Yeah, I know you are wearing one already. But you know, one is never enough.", S_HEAD, 2);
+items[4] = new ItemArmor("Aperture Science Long Fall Boots", "AS Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
+items[5] = new ItemWeapon("Showel", "Showel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
 
 
 function init() {
@@ -114,7 +114,7 @@ function init() {
 		tPlayer[D_LEFT].onload = resLoad;
 		
 		tMonsters = new Array();
-		for (var i = 1; i < monsterTypes.length; i++) {
+		for (var i = 0; i < monsterTypes.length; i++) {
 			tMonsters[i] = new Array();
 			tMonsters[i][D_UP] = new Image();
 			tMonsters[i][D_UP].src = './images/monsters/'+monsterTypes[i].tile+'_up.png'; 
