@@ -116,7 +116,7 @@ function MonsterType(tile, name, desc, artist, hp, att, def) {
   this.att = att;
   this.def = def;
 }
-function itemRecord(itemId, inventoryId, count) {
+function ItemRecord(itemId, inventoryId, count) {
   if (count == undefined)
     count = 1;
 	this.itemId = itemId;
@@ -167,14 +167,16 @@ function Player(name, image, x, y, dir) {
  	this.lastInventoryId = 0;
   this.giveItem = function (item) {
     found = -1;
-    for (var i=0; i < this.inventory.length; i++) {
-      if (this.inventory[i].itemId == item) {
-        found = i;
-        break;
+    if (items[item].stackable) {
+      for (var i=0; i < this.inventory.length; i++) {
+        if (this.inventory[i].itemId == item) {
+          found = i;
+          break;
+        }
       }
     }
     if (found == -1) {
-      this.inventory = this.inventory.concat([new itemRecord(item, ++this.lastInventoryId)]);
+      this.inventory = this.inventory.concat([new ItemRecord(item, ++this.lastInventoryId)]);
       this.inventory.sort(itemRecordCompare);
     } else {
       this.inventory[found].count++;
@@ -199,9 +201,11 @@ function ItemAction(name, desc, use) {
   this.name = name;
   this.desc = desc;
   this.use = use; // is a function that should be passed a Player object
+  this.stackable = true;
 }
-function ItemArmor(name, desc, slot, bonus) {
+function ItemArmor(name, shName, desc, slot, bonus) {
   this.name = name;
+  this.shName = shName;
   this.desc = desc;
   this.slot = slot;
   this.bonus = bonus;
@@ -211,6 +215,7 @@ function ItemArmor(name, desc, slot, bonus) {
   this.unWear = function (player) {
     player.defBonus -= this.bonus;
   }
+  this.stackable = false;
 }
 function ItemWeapon(name, desc, bonus) {
   this.name = name;
@@ -222,4 +227,6 @@ function ItemWeapon(name, desc, bonus) {
   this.unWear = function (player) {
     player.attBonus -= this.bonus;
   }
+  this.slot = S_HANDS;
+  this.stackable = false;
 }

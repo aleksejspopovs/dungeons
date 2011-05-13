@@ -202,25 +202,30 @@ function inventoryKeyHandler(e) {
       drawMap();
     break;
 		case 0x0D: // enter
-			if (items[player.inventory[choice].itemId].__proto__.constructor.name == "ItemAction") {
+      var fail = false;
+			if (items[player.inventory[choice].itemId].__proto__.constructor.name == "ItemAction") { // item is an action item
 				items[player.inventory[choice].itemId].use(player);
 				drawSidebar();
 				player.deleteItem(choice);
-			} else {
+        if (player.inventory.length == choice)
+          choice--;
+			} else {                                                                                 // item is a wearable item
 				if (player.хуйня[items[player.inventory[choice].itemId].slot] != undefined) {
-					if (player.хуйня[items[player.inventory[choice].itemId].slot] == player.inventory[choice].inventoryId) {
+					if (player.хуйня[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId) {
 						player.хуйня[items[player.inventory[choice].itemId].slot] = undefined;
 						items[player.inventory[choice].itemId].unWear(player);
-						monstersTakeTurns();
 					} else { 
+            fail = true;
 						alert("there's already something equipped in this slot");
 					}
 				} else {
-					player.хуйня[items[player.inventory[choice].itemId].slot] = player.inventory[choice].inventoryId;
+					player.хуйня[items[player.inventory[choice].itemId].slot] = player.inventory[choice]; // ItemRecord for the equipped item
 					items[player.inventory[choice].itemId].wear(player);
-					monstersTakeTurns();
 				}
 			}
+      
+      if (!fail)
+        monstersTakeTurns();
 			drawInventory();
 			drawSidebar();
 		break;

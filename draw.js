@@ -19,20 +19,20 @@ function drawInventory() {
 	} else {
 		for (var i=pageStart; i < Math.min(player.inventory.length, pageStart + ITEMS_PER_PAGE); i++) {
       ctx.textAlign = "left";
-			if (player.хуйня[items[player.inventory[i].itemId].slot] == player.inventory[i].inventoryId)
+			if ((player.хуйня[items[player.inventory[i].itemId].slot] != undefined) && (player.хуйня[items[player.inventory[i].itemId].slot].inventoryId == player.inventory[i].inventoryId))
 				ctx.fillStyle = "yellow";
 			else
 				ctx.fillStyle = "white";
 			ctx.fillText(items[player.inventory[i].itemId].name, 30, 65 + 18*(i-pageStart));
-      ctx.textAlign = "right";
-			ctx.fillText(player.inventory[i].count, 647, 65 + 18*(i-pageStart));
+      if (items[player.inventory[i].itemId].stackable) {
+        ctx.textAlign = "right";
+        ctx.fillText(player.inventory[i].count, 647, 65 + 18*(i-pageStart));
+      }
 		}
 		ctx.fillStyle = "white";
     ctx.textAlign = "left";
 		ctx.fillText(">", 20, 65 + 18 * (choice - pageStart));
-	}
-	
-  if (player.inventory.length > 1) {
+
     // writing an item's description
     words = items[player.inventory[choice].itemId].desc.split(" ");
     i = 1;
@@ -44,7 +44,9 @@ function drawInventory() {
       ctx.fillText(cur, 20, 350 + line*18);
       cur = "";
       line++;
-    }	
+    }
+    if (items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") // item is equippable
+      ctx.fillText("You can equip this item on your "+slotNames[items[player.inventory[choice].itemId].slot]+".", 20, 350+18*6);
   }
 }
 
@@ -73,8 +75,16 @@ function drawSidebar() {
 	ctx.fillText(player.xp+"/"+player.toNextLvl+" XP", 682, 67);
 	ctx.fillText("ATT: "+player.getAtt(), 682, 78);
 	ctx.fillText("DEF: "+player.getDef(), 747, 78);
-	ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 105);
+	//ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 105);
 	
+  // equipment
+  ctx.fillText("your equipment:", 682, 105);
+  for (i = 1; i < slotNames.length; i++) {
+    ctx.fillText(slotNames[i]+":", 682, 96+(2*i*9));
+    ctx.fillText("  "+(player.хуйня[i] == undefined ? "none" : items[player.хуйня[i].itemId].shName), 682, 96+((2*i+1)*9));
+  }
+  
+  // minimap
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(

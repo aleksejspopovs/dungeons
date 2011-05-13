@@ -33,8 +33,8 @@ const S_HEAD = 1; // slots
 const S_LEGS = 2;
 const S_ARMS = 3;
 const S_BODY = 4;
-const S_LEFTHAND = 5;
-const S_RIGHTHAND = 6;
+const S_HANDS = 5;
+const slotNames = new Array("", "head", "legs", "arms", "body", "hands");
 
 const ITEMS_PER_PAGE = 15;
 
@@ -55,10 +55,10 @@ monsterTypes[6] = new MonsterType("pedo", "Pedobear", "I love little girls they 
 items = new Array();
 items[1] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); });
 items[2] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; });
-items[3] = new ItemArmor("Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
-items[4] = new ItemArmor("McDonalds Bag", "Yeah, I know you are wearing one already. But you know, one is never enough.", S_HEAD, 2);
-items[5] = new ItemArmor("Aperture Science Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
-items[6] = new ItemWeapon("Showel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
+items[3] = new ItemArmor("Cat ears", "Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
+items[4] = new ItemArmor("McDonalds Bag", "McDonalds Bag", "Yeah, I know you are wearing one already. But you know, one is never enough.", S_HEAD, 2);
+items[5] = new ItemArmor("Aperture Science Long Fall Boots", "AS Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
+items[6] = new ItemWeapon("Showel", "Showel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
 
 
 function init() {
