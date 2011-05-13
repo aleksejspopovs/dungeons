@@ -163,22 +163,19 @@ function Player(name, image, x, y, dir) {
     player.attack = Math.round(player.attack * (1 + randHalf()));
     player.defence = Math.round(player.defence * (1 + randHalf()));
   }
-  this.inventory = new Array(undefined);
+  this.inventory = new Array();
  	this.lastInventoryId = 0;
   this.giveItem = function (item) {
-    found = false;
-    for (var i=1; i<this.inventory.length; i++) {
+    found = -1;
+    for (var i=0; i < this.inventory.length; i++) {
       if (this.inventory[i].itemId == item) {
         found = i;
         break;
       }
     }
-    if (!found) {
+    if (found == -1) {
       this.inventory = this.inventory.concat([new itemRecord(item, ++this.lastInventoryId)]);
       this.inventory.sort(itemRecordCompare);
-      this.inventory.pop();
-      this.inventory = [undefined].concat(this.inventory); // sorry for this dirty hack,
-                                                           // I just love 1-based arrays sooo much <3
     } else {
       this.inventory[found].count++;
     }
@@ -188,8 +185,7 @@ function Player(name, image, x, y, dir) {
     if (this.inventory[item].count < 1) {
       delete this.inventory[item];
       this.inventory.sort(itemRecordCompare);
-      this.inventory.pop(); this.inventory.pop(); // remove two undefined objects (one was made after deleting, the other was a hack)
-      this.inventory = [undefined].concat(this.inventory);
+      this.inventory.pop(); // remove undefined object made after deleting
     }
 	}
 	this.хуйня = new Array(); // sorry, couldn't find another way to call all the stuff that player's wearing

@@ -14,7 +14,7 @@ function drawInventory() {
   ctx.strokeStyle = "white";
   ctx.strokeRect(15, 50, 642, 275); // item list
   ctx.strokeRect(15, 335, 642, 130); // cur item desc
-  if (player.inventory.length == 1) {
+  if (player.inventory.length < 1) {
 		ctx.fillText("Sorry, but it seems you haven't got any items in your inventory :(", 30, 65);
 	} else {
 		for (var i=pageStart; i < Math.min(player.inventory.length, pageStart + ITEMS_PER_PAGE); i++) {

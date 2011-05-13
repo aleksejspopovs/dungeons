@@ -7,7 +7,7 @@ var loaded = 0;
 var toLoad = 9;
 var intervalId = 0;
 var errorCount = 0;
-var choice = 1, pageStart = 1; // for menus
+var choice = 1, pageStart = 0; // for menus
 
 player = new Player("Anonymous", "bag", 25, 25, 3);
 monsters = new Array();
@@ -38,20 +38,6 @@ function newGame(level) {
 function attack(att, def) {
 	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
 	def.dir = ((att.dir + 2) % 4 == 0) ? 4 : (att.dir + 2) % 4;
-	/*switch (att.dir) {
-		case 1: 
-			def.dir = 3;
-		break; 
-		case 2: 
-			def.dir = 4;
-		break;
-		case 3:
-			def.dir = 1;
-		break;
-		case 4:
-			def.dir = 2;
-		break;
-	}*/
 	if (Math.random() > (att.getAtt() - def.getDef()) / (2*(att.getAtt() + def.getDef()))) {
 		var damage = Math.round(def.maxHp * ((randH(1, 3) * att.getAtt()) / (10 * att.getAtt())));
 		def.hp -= damage;
@@ -184,8 +170,8 @@ function turn(event) {
       monstersTakeTurns();
     break;
     case A_INVENTORY:
-			choice = 1;
-			pageStart = 1;
+			choice = 0;
+			pageStart = 0;
       setKeyListener(inventoryKeyHandler);
       drawInventory();
       dontRedraw = true;
@@ -200,7 +186,7 @@ function turn(event) {
 function inventoryKeyHandler(e) {
   switch (e.keyCode) {
 		case 0x26:
-			if (choice > 1) choice--;
+			if (choice > 0) choice--;
 			if (choice < pageStart) pageStart--;
 			e.preventDefault();
 			drawInventory();
