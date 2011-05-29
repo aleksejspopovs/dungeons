@@ -84,9 +84,6 @@ function init() {
 		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
 		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4 == 0) ? 0 : (i % 4 == 1) ? 127 : 255;		
 		
-		tTerrains[0] = new Image(); // Undefined (black)
-		tTerrains[0].src = './images/undefined.png';
-		tTerrains[0].onload = resLoad;
 		tTerrains[1] = new Image(); // Floor
 		tTerrains[1].src = './images/floor.png';
 		tTerrains[1].onload = resLoad;
