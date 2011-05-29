@@ -2,11 +2,12 @@
 // this software is available under MIT License, see LICENSE for more info
 // free software is our future
 
-function DungeonTile(tile, passable, monster, item) {
+function DungeonTile(tile, passable) {
 	this.tile = tile;
 	this.pass = passable;
-	this.monster = monster;
-	this.item = item;
+	this.monster = -1;
+  this.gold = 0;
+  this.item = -1;
 	this.known = false;
 }
 function Monster(id, type, lvl, mX, mY, dir) {
@@ -44,7 +45,8 @@ function Monster(id, type, lvl, mX, mY, dir) {
 				var dir = rand(1,4);
         tries = 0;
 				while ((
-					!checkCoords(this.x + xOff[dir], this.y + yOff[dir]) || !dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster
+					!checkCoords(this.x + xOff[dir], this.y + yOff[dir]) || !dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster != -1 ||
+          dungeon[this.x + xOff[dir]][this.y + yOff[dir]].gold != 0 || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].item != -1
 				) && tries < 5) { // 5 is here just for it to be easier to check whether monster found a way or not
 					dir = dir % 4 + 1;
           tries++;
@@ -55,7 +57,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
           step = new Coords(this.x + xOff[dir], this.y + yOff[dir], dir);
 			}
       if (step != null) {
-        dungeon[this.x][this.y].monster = false;
+        dungeon[this.x][this.y].monster = -1;
         this.x = step.x;
         this.y = step.y;
         this.dir = step.dir;
@@ -64,7 +66,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 		}
 	}
 	this.dead = function () {
-		dungeon[this.x][this.y].monster = 0;
+		dungeon[this.x][this.y].monster = -1;
     if ((this.lvl - player.lvl) > 0) {
       player.xp += randH(2, 4) * (this.lvl - player.lvl);
     } else {
@@ -93,7 +95,8 @@ function Monster(id, type, lvl, mX, mY, dir) {
 				mvY = curY + yOff[i];
 				if (checkCoords(mvX, mvY) && 
 						(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) && 
-						(!dungeon[mvX][mvY].monster || (mvX == this.x && mvY == this.y))) { // this.x;this.y is a monster obviously, so we should check for that
+						(dungeon[mvX][mvY].monster == -1 || (mvX == this.x && mvY == this.y)) && // this.x;this.y is a monster obviously, so we should check for that
+            dungeon[mvX][mvY].gold == 0 && dungeon[mvX][mvY].item == -1) { 
 					cost[mvX][mvY] = cost[curX][curY]+1;
 					queue[w] = new Coords(mvX, mvY, 0);
 					w++;
@@ -139,6 +142,7 @@ function Player(name, image, x, y, dir) {
 	this.defence = 5;
   this.attBonus = 0;
   this.defBonus = 0;
+  this.gold = 0;
   this.getAtt = function () {
     return this.attack + this.attBonus;
   }
@@ -217,8 +221,9 @@ function ItemArmor(name, shName, desc, slot, bonus) {
   }
   this.stackable = false;
 }
-function ItemWeapon(name, desc, bonus) {
+function ItemWeapon(name, shName, desc, bonus) {
   this.name = name;
+  this.shName = shName;
   this.desc = desc;
   this.bonus = bonus;
   this.wear = function (player) {

@@ -75,6 +75,8 @@ function drawSidebar() {
 	ctx.fillText(player.xp+"/"+player.toNextLvl+" XP", 682, 67);
 	ctx.fillText("ATT: "+player.getAtt(), 682, 78);
 	ctx.fillText("DEF: "+player.getDef(), 747, 78);
+ 	ctx.fillText("gold: "+player.gold, 682, 89);
+
 	//ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 105);
 	
   // equipment
@@ -88,7 +90,7 @@ function drawSidebar() {
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
-				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster ? MT_MONSTER : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
+				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster != -1 ? MT_MONSTER : dungeon[i][j].item != -1 ? MT_ITEM : dungeon[i][j].gold != 0 ? MT_GOLD : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
 				672+((i-1)*3),
 				330+((j-1)*3)
 			);
@@ -104,9 +106,12 @@ function drawMap() {
 	for (var i = startX; i < startX + G_WIDTH; i++) {
 		for (var j = startY; j < startY + G_HEIGHT; j++) {
 			ctx.drawImage(tTerrains[dungeon[i][j].tile], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
-			if (dungeon[i][j].monster) { 
+			if (dungeon[i][j].monster != -1)
 				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
-			}
+      if (dungeon[i][j].item != -1)
+        ctx.drawImage(tTerrains[T_ITEM], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
+      if (dungeon[i][j].gold != 0)
+        ctx.drawImage(tTerrains[T_GOLD], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 		}
 	}
 	ctx.drawImage(tPlayer[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);

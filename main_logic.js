@@ -4,7 +4,7 @@
 
 var dungeon, temp, bgm;
 var loaded = 0;
-var toLoad = 9;
+var toLoad = 10;
 var intervalId = 0;
 var errorCount = 0;
 var choice = 1, pageStart = 0; // for menus
@@ -52,8 +52,8 @@ function attack(att, def) {
 }
 
 function monstersTakeTurns() {
-  for (var i = 1; i < monsters.length; i++) { // AI players take their turns
-    if (monsters[i].hp > 0 && player.hp > 0) 
+  for (var i = 0; i < monsters.length; i++) { // AI players take their turns
+    if (monsters[i].hp > 0 && player.hp > 0)
       monsters[i].takeTurn(); // if monster is not dead, make him take his turn
   }
 }
@@ -114,13 +114,23 @@ function turn(event) {
 	switch (action) {
     case A_MOVE:
        if (dungeon[nX][nY].pass) {
-        if (dungeon[nX][nY].monster) {
+        if (dungeon[nX][nY].monster != -1) {
           attack(player, monsters[dungeon[nX][nY].monster]); // player bumped in a monster
         } else {
+          if (dungeon[nX][nY].item != -1) {
+            player.giveItem(dungeon[nX][nY].item);
+            log(player.name+" has picked up "+items[dungeon[nX][nY].item].name+" and put it into his backpack.");
+            dungeon[nX][nY].item = -1;
+          }
+          if (dungeon[nX][nY].gold != 0) {
+            player.gold += dungeon[nX][nY].gold;
+            log(player.name+" has picked up "+dungeon[nX][nY].gold+" gold coins and put them into his pocket.");
+            dungeon[nX][nY].gold = 0;
+          }
           player.x = nX;
           player.y = nY;
      
-          if (player.dir == D_LEFT || player.dir == D_RIGHT) { // TODO: completely rewrite this piece of shit
+          if (player.dir == D_LEFT || player.dir == D_RIGHT) {
             if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
               for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
             }
@@ -137,28 +147,28 @@ function turn(event) {
       }
     break
     case A_DIG:
-      if (checkCoords(nX+xOff[player.dir], nY+yOff[player.dir]) && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].monster && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile != T_EXIT) {
+      if (checkCoords(nX+xOff[player.dir], nY+yOff[player.dir]) && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].monster == -1 && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile != T_EXIT) {
         dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass = true;
-        dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile = 1;
+        dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile = T_FLOOR;
         for (var i = ((player.x < 3) ? 1 : (player.x - 2)); i <= ((player.x > 48) ? 50 : (player.x + 2)); i++) {
           for (var j = ((player.y < 3) ? 1 : (player.y - 2)); j <= ((player.y > 48) ? 50 : (player.y + 2)); j++) {
-            if (dungeon[i][j].tile == 2 && (dungeon[i][j+1] == undefined || (dungeon[i][j+1].tile != 2 && dungeon[i][j+1].tile != 4))) 
-              dungeon[i][j].tile = 4;
+            if (dungeon[i][j].tile == T_WALL && (dungeon[i][j+1] == undefined || (dungeon[i][j+1].tile != T_WALL && dungeon[i][j+1].tile != T_WALLC))) 
+              dungeon[i][j].tile = T_WALLC;
           }
         }
         monstersTakeTurns();
       }
     break;
     case A_BUILD:
-      if (checkCoords(nX+xOff[player.dir], nY+yOff[player.dir]) && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].monster && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass) {
+      if (checkCoords(nX+xOff[player.dir], nY+yOff[player.dir]) && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].monster == -1 && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass) {
         dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass = false;
-        dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile = 2;
+        dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile = T_WALL;
         for (var i = ((player.x < 3) ? 1 : (player.x - 2)); i <= ((player.x > 48) ? 50 : (player.x + 2)); i++) {
           for (var j = ((player.y < 3) ? 1 : (player.y - 2)); j <= ((player.y > 48) ? 50 : (player.y + 2)); j++) {
-            if (dungeon[i][j].tile == 2 && (dungeon[i][j+1] == undefined || (dungeon[i][j+1].tile != 2 && dungeon[i][j+1].tile != 4))) 
-              dungeon[i][j].tile = 4;
-            if (dungeon[i][j].tile == 4 && dungeon[i][j+1] != undefined && (dungeon[i][j+1].tile == 2 || dungeon[i][j+1].tile == 4))
-              dungeon[i][j].tile = 2;
+            if (dungeon[i][j].tile == T_WALL && (dungeon[i][j+1] == undefined || (dungeon[i][j+1].tile != T_WALL && dungeon[i][j+1].tile != T_WALLC))) 
+              dungeon[i][j].tile = T_WALLC;
+            if (dungeon[i][j].tile == 4 && dungeon[i][j+1] != undefined && (dungeon[i][j+1].tile == T_WALL || dungeon[i][j+1].tile == T_WALLC))
+              dungeon[i][j].tile = T_WALL;
           }
         }
         monstersTakeTurns();

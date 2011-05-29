@@ -20,8 +20,15 @@ const MT_UNDEF = 3;
 const MT_PLAYER = 4;
 const MT_MONSTER = 5;
 const MT_EXIT = 6;
+const MT_GOLD = 7;
+const MT_ITEM = 8;
 
-const T_EXIT = 3; // tiles
+const T_FLOOR = 1; // tiles
+const T_WALL = 2;
+const T_EXIT = 3;
+const T_WALLC = 4;
+const T_GOLD = 5;
+const T_ITEM = 6;
 
 const A_MOVE = 1; // actions
 const A_DIG = 2;
@@ -83,19 +90,29 @@ function init() {
 		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
 		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
 		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4 == 0) ? 0 : (i % 4 == 1) ? 127 : 255;		
+    mapTiles[MT_GOLD] = ctx.createImageData(3,3);
+    for (var i = 0; i <= 35; i++) mapTiles[MT_GOLD].data[i] = (i % 4 == 0 || i % 4 == 3) ? 255 : (i % 4 == 1) ? 215 : 0;
+    mapTiles[MT_ITEM] = ctx.createImageData(3,3);
+    for (var i = 0; i <= 35; i++) mapTiles[MT_ITEM].data[i] = (i % 2 == 0) ? 0 : (i % 4 == 1) ? 112 : 255;		
 		
-		tTerrains[1] = new Image(); // Floor
-		tTerrains[1].src = './images/floor.png';
-		tTerrains[1].onload = resLoad;
-		tTerrains[2] = new Image(); // Wall
-		tTerrains[2].src = './images/wall.png';
-		tTerrains[2].onload = resLoad;
-		tTerrains[3] = new Image(); // Exit
-		tTerrains[3].src = './images/exit.png';
-		tTerrains[3].onload = resLoad;
-		tTerrains[4] = new Image(); // Wall corner
-		tTerrains[4].src = './images/wall_corner.png';
-		tTerrains[4].onload = resLoad;
+		tTerrains[T_FLOOR] = new Image(); // Floor
+		tTerrains[T_FLOOR].src = './images/floor.png';
+		tTerrains[T_FLOOR].onload = resLoad;
+		tTerrains[T_WALL] = new Image(); // Wall
+		tTerrains[T_WALL].src = './images/wall.png';
+		tTerrains[T_WALL].onload = resLoad;
+		tTerrains[T_EXIT] = new Image(); // Exit
+		tTerrains[T_EXIT].src = './images/exit.png';
+		tTerrains[T_EXIT].onload = resLoad;
+		tTerrains[T_WALLC] = new Image(); // Wall corner
+		tTerrains[T_WALLC].src = './images/wall_corner.png';
+		tTerrains[T_WALLC].onload = resLoad;
+    tTerrains[T_GOLD] = new Image(); // Some gold
+		tTerrains[T_GOLD].src = './images/gold.png';
+		tTerrains[T_GOLD].onload = resLoad;
+    tTerrains[T_ITEM] = new Image(); // An item
+		tTerrains[T_ITEM].src = './images/bag.png';
+		tTerrains[T_ITEM].onload = resLoad;
 		
 		tPlayer[D_UP] = new Image(); // Player facing up
 		tPlayer[D_UP].src = './images/'+player.image+'/up.png';
