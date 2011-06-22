@@ -64,18 +64,18 @@ function rand(a,b) {
 }
 
 function randH(a,b) {
-  return rand(a,b) + (Math.random() >= 0.5 ? 0.5 : 0);
+	return rand(a,b) + (Math.random() >= 0.5 ? 0.5 : 0);
 }
 
 function randHalf() {
-  var x = Math.random();
-  while (x > 0.5)
-    x = Math.random();
-  return x;
+	var x = Math.random();
+	while (x > 0.5)
+		x = Math.random();
+	return x;
 }
 
 function checkCoords(x, y) {
-  return x >= 1 && x <= LEVELSIZE && y >= 1 && y <= LEVELSIZE;
+	return x >= 1 && x <= LEVELSIZE && y >= 1 && y <= LEVELSIZE;
 }
 
 function closeOverlay() {
@@ -104,7 +104,7 @@ function generateArtsInfo() {
 }
 
 function getFloorString(floor) {
-  return Math.round((floor % 100)/10) == 1 ? (floor+"th") : (floor % 10 == 1 ? (floor+"st") : (floor % 10 == 2 ? (floor+"nd") : (floor % 10 == 3 ? (floor+"rd") : (floor+"th"))));
+	return Math.round((floor % 100)/10) == 1 ? (floor+"th") : (floor % 10 == 1 ? (floor+"st") : (floor % 10 == 2 ? (floor+"nd") : (floor % 10 == 3 ? (floor+"rd") : (floor+"th"))));
 }
 
 function browserCheck() {
@@ -112,12 +112,12 @@ function browserCheck() {
 }
 
 function setKeyListener(l) {
-  if (navigator.appName == "Opera")
-    document.onkeypress = l;
-  else 
-    document.onkeydown = l;
+	if (navigator.appName == "Opera")
+		document.onkeypress = l;
+	else 
+		document.onkeydown = l;
 }
 
 function itemRecordCompare(a, b) {
-  return ((a.itemId == undefined) || (items[a.itemId].name > items[b.itemId].name));
+	return ((a.itemId == undefined) || (items[a.itemId].name > items[b.itemId].name));
 }

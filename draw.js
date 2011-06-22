@@ -3,51 +3,51 @@
 // free software is our future
 
 function drawInventory() {
-  ctx.fillStyle = 'black';
-  ctx.fillRect(10, 10, 652, 460);
-  ctx.fillStyle = 'white';
-  ctx.textAlign = "center";
-  ctx.font = "16pt '04b03r'";
-  ctx.fillText("Inventory", 336, 40);
-  ctx.font = "12pt '04b03r'";
-  ctx.textAlign = "left";
-  ctx.strokeStyle = "white";
-  ctx.strokeRect(15, 50, 642, 275); // item list
-  ctx.strokeRect(15, 335, 642, 130); // cur item desc
-  if (player.inventory.length < 1) {
+	ctx.fillStyle = 'black';
+	ctx.fillRect(10, 10, 652, 460);
+	ctx.fillStyle = 'white';
+	ctx.textAlign = "center";
+	ctx.font = "16pt '04b03r'";
+	ctx.fillText("Inventory", 336, 40);
+	ctx.font = "12pt '04b03r'";
+	ctx.textAlign = "left";
+	ctx.strokeStyle = "white";
+	ctx.strokeRect(15, 50, 642, 275); // item list
+	ctx.strokeRect(15, 335, 642, 130); // cur item desc
+	if (player.inventory.length < 1) {
 		ctx.fillText("Sorry, but it seems you haven't got any items in your inventory :(", 30, 65);
 	} else {
 		for (var i=pageStart; i < Math.min(player.inventory.length, pageStart + ITEMS_PER_PAGE); i++) {
-      ctx.textAlign = "left";
+			ctx.textAlign = "left";
 			if ((player.хуйня[items[player.inventory[i].itemId].slot] != undefined) && (player.хуйня[items[player.inventory[i].itemId].slot].inventoryId == player.inventory[i].inventoryId))
 				ctx.fillStyle = "yellow";
 			else
 				ctx.fillStyle = "white";
 			ctx.fillText(items[player.inventory[i].itemId].name, 30, 65 + 18*(i-pageStart));
-      if (items[player.inventory[i].itemId].stackable) {
-        ctx.textAlign = "right";
-        ctx.fillText(player.inventory[i].count, 647, 65 + 18*(i-pageStart));
-      }
+			if (items[player.inventory[i].itemId].stackable) {
+				ctx.textAlign = "right";
+				ctx.fillText(player.inventory[i].count, 647, 65 + 18*(i-pageStart));
+			}
 		}
 		ctx.fillStyle = "white";
-    ctx.textAlign = "left";
+		ctx.textAlign = "left";
 		ctx.fillText(">", 20, 65 + 18 * (choice - pageStart));
 
-    // writing an item's description
-    words = items[player.inventory[choice].itemId].desc.split(" ");
-    i = 1;
-    line = 0;
-    cur = words[0];
-    while (i <= words.length-1) {
-      while ((i <= words.length-1) && (ctx.measureText(cur + " " + words[i]).width <= 622))
-        cur += " " + words[i++];
-      ctx.fillText(cur, 20, 350 + line*18);
-      cur = "";
-      line++;
-    }
-    if (items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") // item is equippable
-      ctx.fillText("You can equip this item on your "+slotNames[items[player.inventory[choice].itemId].slot]+".", 20, 350+18*6);
-  }
+		// writing an item's description
+		words = items[player.inventory[choice].itemId].desc.split(" ");
+		i = 1;
+		line = 0;
+		cur = words[0];
+		while (i <= words.length-1) {
+			while ((i <= words.length-1) && (ctx.measureText(cur + " " + words[i]).width <= 622))
+				cur += " " + words[i++];
+			ctx.fillText(cur, 20, 350 + line*18);
+			cur = "";
+			line++;
+		}
+		if (items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") // item is equippable
+			ctx.fillText("You can equip this item on your "+slotNames[items[player.inventory[choice].itemId].slot]+".", 20, 350+18*6);
+	}
 }
 
 function drawSidebar() {
@@ -75,18 +75,18 @@ function drawSidebar() {
 	ctx.fillText(player.xp+"/"+player.toNextLvl+" XP", 682, 67);
 	ctx.fillText("ATT: "+player.getAtt(), 682, 78);
 	ctx.fillText("DEF: "+player.getDef(), 747, 78);
- 	ctx.fillText("gold: "+player.gold, 682, 89);
+	ctx.fillText("gold: "+player.gold, 682, 89);
 
 	//ctx.fillText("X;Y: "+player.x+";"+player.y, 682, 105);
 	
-  // equipment
-  ctx.fillText("your equipment:", 682, 105);
-  for (i = 1; i < slotNames.length; i++) {
-    ctx.fillText(slotNames[i]+":", 682, 96+(2*i*9));
-    ctx.fillText("  "+(player.хуйня[i] == undefined ? "none" : items[player.хуйня[i].itemId].shName), 682, 96+((2*i+1)*9));
-  }
-  
-  // minimap
+	// equipment
+	ctx.fillText("your equipment:", 682, 105);
+	for (i = 1; i < slotNames.length; i++) {
+		ctx.fillText(slotNames[i]+":", 682, 96+(2*i*9));
+		ctx.fillText("  "+(player.хуйня[i] == undefined ? "none" : items[player.хуйня[i].itemId].shName), 682, 96+((2*i+1)*9));
+	}
+	
+	// minimap
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
 			ctx.putImageData(
@@ -108,10 +108,10 @@ function drawMap() {
 			ctx.drawImage(tTerrains[dungeon[i][j].tile], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 			if (dungeon[i][j].monster != -1)
 				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
-      if (dungeon[i][j].item != -1)
-        ctx.drawImage(tTerrains[T_ITEM], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
-      if (dungeon[i][j].gold != 0)
-        ctx.drawImage(tTerrains[T_GOLD], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
+			if (dungeon[i][j].item != -1)
+				ctx.drawImage(tTerrains[T_ITEM], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
+			if (dungeon[i][j].gold != 0)
+				ctx.drawImage(tTerrains[T_GOLD], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 		}
 	}
 	ctx.drawImage(tPlayer[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);

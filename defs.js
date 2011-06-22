@@ -90,10 +90,10 @@ function init() {
 		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
 		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
 		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4 == 0) ? 0 : (i % 4 == 1) ? 127 : 255;		
-    mapTiles[MT_GOLD] = ctx.createImageData(3,3);
-    for (var i = 0; i <= 35; i++) mapTiles[MT_GOLD].data[i] = (i % 4 == 0 || i % 4 == 3) ? 255 : (i % 4 == 1) ? 215 : 0;
-    mapTiles[MT_ITEM] = ctx.createImageData(3,3);
-    for (var i = 0; i <= 35; i++) mapTiles[MT_ITEM].data[i] = (i % 2 == 0) ? 0 : (i % 4 == 1) ? 112 : 255;		
+		mapTiles[MT_GOLD] = ctx.createImageData(3,3);
+		for (var i = 0; i <= 35; i++) mapTiles[MT_GOLD].data[i] = (i % 4 == 0 || i % 4 == 3) ? 255 : (i % 4 == 1) ? 215 : 0;
+		mapTiles[MT_ITEM] = ctx.createImageData(3,3);
+		for (var i = 0; i <= 35; i++) mapTiles[MT_ITEM].data[i] = (i % 2 == 0) ? 0 : (i % 4 == 1) ? 112 : 255;		
 		
 		tTerrains[T_FLOOR] = new Image(); // Floor
 		tTerrains[T_FLOOR].src = './images/floor.png';
@@ -107,10 +107,10 @@ function init() {
 		tTerrains[T_WALLC] = new Image(); // Wall corner
 		tTerrains[T_WALLC].src = './images/wall_corner.png';
 		tTerrains[T_WALLC].onload = resLoad;
-    tTerrains[T_GOLD] = new Image(); // Some gold
+		tTerrains[T_GOLD] = new Image(); // Some gold
 		tTerrains[T_GOLD].src = './images/gold.png';
 		tTerrains[T_GOLD].onload = resLoad;
-    tTerrains[T_ITEM] = new Image(); // An item
+		tTerrains[T_ITEM] = new Image(); // An item
 		tTerrains[T_ITEM].src = './images/bag.png';
 		tTerrains[T_ITEM].onload = resLoad;
 		
