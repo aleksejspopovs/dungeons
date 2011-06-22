@@ -141,3 +141,39 @@ function levelExit(full) {
 	ctx.fillText("Shop and leave", 652-ctx.measureText("Shop and leave").width, 130);
 	ctx.fillText(">", 652-ctx.measureText("Shop and leave").width-10, 70 + 20*choice);
 }
+
+function drawTestAnimation(frame) {
+	if (frame == 1) 
+		setKeyListener(undefined);
+	
+	drawMap();
+	tile = ((frame % 2) == 1) ? testAnimation1 : testAnimation2;
+	x = player.x - Math.max(1, Math.min(51-G_WIDTH, player.x-10));
+	y = player.y - Math.max(1, Math.min(51-G_HEIGHT, player.y-7));
+	switch (player.dir) {
+		case D_UP:
+			y -= frame;
+		break;
+		case D_DOWN:
+			y += frame;
+		break;
+		case D_LEFT:
+			x -= frame;
+		break;
+		case D_RIGHT:
+			x += frame;
+		break;
+	}
+	if ((x >= G_WIDTH) || (y >= G_HEIGHT) || (x < 0) || (y < 0)) {
+		setKeyListener(turn);
+		return;
+	}
+	x *= TILESIZE;
+	y *= TILESIZE;
+	ctx.drawImage(tile, x, y);
+	
+	if (frame == 5)	{
+		setTimeout(function () { drawMap(); setKeyListener(turn); }, 200);
+	} else
+		setTimeout(function () {drawTestAnimation(++frame)}, 250);
+}

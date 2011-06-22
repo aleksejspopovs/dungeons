@@ -35,6 +35,7 @@ const A_DIG = 2;
 const A_STAY = 3;
 const A_BUILD = 4;
 const A_INVENTORY = 5;
+const A_TEST = 6;
 
 const S_HEAD = 1; // slots
 const S_LEGS = 2;
@@ -95,6 +96,11 @@ function init() {
 		mapTiles[MT_ITEM] = ctx.createImageData(3,3);
 		for (var i = 0; i <= 35; i++) mapTiles[MT_ITEM].data[i] = (i % 2 == 0) ? 0 : (i % 4 == 1) ? 112 : 255;		
 		
+		testAnimation1 = new Image();
+		testAnimation1.src = './images/HEX_1.png';
+		testAnimation2 = new Image();
+		testAnimation2.src = './images/HEX_2.png';
+
 		tTerrains[T_FLOOR] = new Image(); // Floor
 		tTerrains[T_FLOOR].src = './images/floor.png';
 		tTerrains[T_FLOOR].onload = resLoad;

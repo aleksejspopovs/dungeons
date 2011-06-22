@@ -103,11 +103,14 @@ function turn(event) {
 			action = A_INVENTORY;
 			event.preventDefault();
 		break;
+		case 0x5A: // z for.. well, whatever
+		case 0x7A:
+			action = A_TEST;
+			event.preventDefault();
+		break;
 		case 0x0D:
 			action = A_STAY;
-		break;
-		default:
-			nX = -1;
+			event.preventDefault();
 		break;
 	}
 
@@ -145,7 +148,7 @@ function turn(event) {
 				levelExit(true);
 				dontRedraw = true;
 			}
-		break
+		break;
 		case A_DIG:
 			if (checkCoords(nX+xOff[player.dir], nY+yOff[player.dir]) && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].monster == -1 && !dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass && dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile != T_EXIT) {
 				dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].pass = true;
@@ -184,6 +187,10 @@ function turn(event) {
 			pageStart = 0;
 			setKeyListener(inventoryKeyHandler);
 			drawInventory();
+			dontRedraw = true;
+		break;
+		case A_TEST:
+			drawTestAnimation(1);
 			dontRedraw = true;
 		break;
 	}
