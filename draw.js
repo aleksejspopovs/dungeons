@@ -106,12 +106,12 @@ function drawMap() {
 	for (var i = startX; i < startX + G_WIDTH; i++) {
 		for (var j = startY; j < startY + G_HEIGHT; j++) {
 			ctx.drawImage(tTerrains[dungeon[i][j].tile], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
-			if (dungeon[i][j].monster != -1)
-				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 			if (dungeon[i][j].item != -1)
 				ctx.drawImage(tTerrains[T_ITEM], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 			if (dungeon[i][j].gold != 0)
 				ctx.drawImage(tTerrains[T_GOLD], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
+			if (dungeon[i][j].monster != -1)
+				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 		}
 	}
 	ctx.drawImage(tPlayer[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);

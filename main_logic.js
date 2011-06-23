@@ -247,6 +247,19 @@ function inventoryKeyHandler(e) {
 			drawInventory();
 			drawSidebar();
 		break;
+		case 0x44: // d for drop
+		case 0x64:
+			if ((items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") && (player.хуйня[items[player.inventory[choice].itemId].slot] !== undefined)  && (player.хуйня[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId)) {
+				log("You <b>can't drop</b> something you're wearing.");
+			} else if (!(dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].pass) || dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].gold || (dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].item != -1)) {
+				log("You <b>can't drop</b> items on walls and floor tiles that already have items or coins on them.");
+			} else {
+				dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].item = player.inventory[choice].itemId;
+				player.deleteItem(choice);
+				drawMap();
+				setKeyListener(turn);
+			}			
+		break;
 	}
 }
 function levelExitKeyHandler(e) {

@@ -45,8 +45,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 				var dir = rand(1,4);
 				tries = 0;
 				while ((
-					!checkCoords(this.x + xOff[dir], this.y + yOff[dir]) || !dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster != -1 ||
-					dungeon[this.x + xOff[dir]][this.y + yOff[dir]].gold != 0 || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].item != -1
+					!checkCoords(this.x + xOff[dir], this.y + yOff[dir]) || !dungeon[this.x + xOff[dir]][this.y + yOff[dir]].pass || dungeon[this.x + xOff[dir]][this.y + yOff[dir]].monster != -1
 				) && tries < 5) { // 5 is here just for it to be easier to check whether monster found a way or not
 					dir = dir % 4 + 1;
 					tries++;
@@ -95,9 +94,9 @@ function Monster(id, type, lvl, mX, mY, dir) {
 				mvX = curX + xOff[i];
 				mvY = curY + yOff[i];
 				if (checkCoords(mvX, mvY) && 
-						(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) && 
-						(dungeon[mvX][mvY].monster == -1 || (mvX == this.x && mvY == this.y)) && // this.x;this.y is a monster obviously, so we should check for that
-						dungeon[mvX][mvY].gold == 0 && dungeon[mvX][mvY].item == -1) { 
+					(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) && 
+					(dungeon[mvX][mvY].monster == -1 || (mvX == this.x && mvY == this.y)) // this.x;this.y is a monster obviously, so we should check for that
+				) { 
 					cost[mvX][mvY] = cost[curX][curY]+1;
 					queue[w] = new Coords(mvX, mvY, 0);
 					w++;
@@ -190,9 +189,7 @@ function Player(name, image, x, y, dir) {
 	this.deleteItem = function (item) {
 		this.inventory[item].count--;
 		if (this.inventory[item].count < 1) {
-			delete this.inventory[item];
-			this.inventory.sort(itemRecordCompare);
-			this.inventory.pop(); // remove undefined object made after deleting
+			this.inventory.splice(item, 1);
 		}
 	}
 	this.хуйня = new Array(); // sorry, couldn't find another way to call all the stuff that player's wearing
