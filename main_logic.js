@@ -19,7 +19,7 @@ tTerrains = new Array();
 function resLoad() {
 	loaded++;
 	if (loaded >= toLoad) {
-		document.getElementById("gamelog").value = "All the stuff succesfully loaded.";
+		document.getElementById("gamelog").innerHTML = "All the stuff succesfully loaded.";
 		setTimeout(function () {newGame(1); }, 125);
 	}
 }
@@ -32,21 +32,22 @@ function newGame(level) {
 	drawSidebar();
 	drawMap(); 
 	setKeyListener(turn);
-	log(player.name+" has entered the dungeon's "+getFloorString(level)+" floor.");
+	log("<b>"+player.name+"</b> has entered the dungeon's <b>"+getFloorString(level)+" floor</b>.");
 }
 
 function attack(att, def) {
 	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
 	def.dir = ((att.dir + 2) % 4 == 0) ? 4 : (att.dir + 2) % 4;
-	if (Math.random() > (att.getAtt() - def.getDef()) / (2*(att.getAtt() + def.getDef()))) {
-		var damage = Math.round(def.maxHp * ((randH(1, 3) * att.getAtt()) / (10 * att.getAtt())));
+	if (Math.random() >= (def.getDef() - att.getAtt())/10) {
+		var damage = Math.round(def.hp*Math.min(1, (-(def.getDef() - att.getAtt() - 10))/20));
+		//Math.round(def.maxHp * ((randH(1, 3) * att.getAtt()) / (10 * att.getAtt())));
 		def.hp -= damage;
-		log(att.name+' has attacked '+def.name+' and done '+damage+' points of damage.');
+		log("<b>"+att.name+"</b> has attacked <b>"+def.name+"</b> and done <b>"+damage+"</b> points of damage.");
 	} else {
-		log(att.name+' has tried to attack '+def.name+', but missed!');
+		log("<b>"+att.name+"</b> has tried to attack <b>"+def.name+"</b>, but <b>missed</b>!");
 	}
 	if (def.hp < 1) {
-		log(def.name+' died.');
+		log("<b>"+def.name+'</b> died.');
 		def.dead();
 	}
 }
@@ -122,12 +123,12 @@ function turn(event) {
 				} else {
 					if (dungeon[nX][nY].item != -1) {
 						player.giveItem(dungeon[nX][nY].item);
-						log(player.name+" has picked up "+items[dungeon[nX][nY].item].name+" and put it into his backpack.");
+						log("<b>"+player.name+"</b> has picked up <b>"+items[dungeon[nX][nY].item].name+"</b> and put it into his backpack.");
 						dungeon[nX][nY].item = -1;
 					}
 					if (dungeon[nX][nY].gold != 0) {
 						player.gold += dungeon[nX][nY].gold;
-						log(player.name+" has picked up "+dungeon[nX][nY].gold+" gold coins and put them into his pocket.");
+						log("<b>"+player.name+"</b> has picked up <b>"+dungeon[nX][nY].gold+"</b> gold coins and put them into his pocket.");
 						dungeon[nX][nY].gold = 0;
 					}
 					player.x = nX;
@@ -233,7 +234,7 @@ function inventoryKeyHandler(e) {
 						items[player.inventory[choice].itemId].unWear(player);
 					} else { 
 						fail = true;
-						alert("there's already something equipped in this slot");
+						log("You <b>can't equip</b> this item because you're already wearing something on your <b>"+slotNames[items[player.inventory[choice].itemId].slot]+".");
 					}
 				} else {
 					player.хуйня[items[player.inventory[choice].itemId].slot] = player.inventory[choice]; // ItemRecord for the equipped item
@@ -271,7 +272,7 @@ function levelExitKeyHandler(e) {
 					drawSidebar();
 				break;
 				case 2:
-					log(player.name + " has decided to get deeper into this dungeon.");
+					log("<b>"+player.name+"</b> has decided to get deeper into this dungeon.");
 					newGame(dungeon.level + 1);
 				break;
 				case 3:

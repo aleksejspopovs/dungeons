@@ -53,16 +53,23 @@ const music = new Array("8bit-slow.ogg", "Winged-tune.ogg");
 
 monsterTypes = new Array();
 // monsterTypes[i] = new MonsterType(tileName, monsterName, description, author, hp on 1st lvl, att on 1st lvl, def on 1st lvl);
-monsterTypes[0] = new MonsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 10, 4, 4);
+/*monsterTypes[0] = new MonsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 10, 4, 4);
 monsterTypes[1] = new MonsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 8, 3, 4);
 monsterTypes[2] = new MonsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 15, 5, 5);
 monsterTypes[3] = new MonsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 7, 3, 2);
 monsterTypes[4] = new MonsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 17, 6, 4);
-monsterTypes[5] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 3, 5);
+monsterTypes[5] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 3, 5);*/
+monsterTypes[0] = new MonsterType("troll", "Troll", "An ordinary fat and green troll.", "Endou", 10, 1, 1);
+monsterTypes[1] = new MonsterType("trolltan", "Troll-tan", "She always chooses to GTFO.", "Endou", 8, 1, 1);
+monsterTypes[2] = new MonsterType("wdoom", "Winged Doom", "Welcome to Omsk!", "Dark Sentinel", 15, 1, 1);
+monsterTypes[3] = new MonsterType("cancer", "Cancer", "He's the one killing /b/", "Dark Sentinel", 7, 1, 1);
+monsterTypes[4] = new MonsterType("gazel", "Gazelle", "You should pass the fare!", "NeverArt", 17, 1, 1);
+monsterTypes[5] = new MonsterType("pedo", "Pedobear", "I love little girls they make me feel so good :3", "Anonymous artist from Dobrochan #1", 10, 1, 1);
+
 
 items = new Array();
-items[0] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); });
-items[1] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; });
+items[0] = new ItemAction("Troll food", "Refills your health a little bit.", function (p) { p.addHp(10); }, "ate", "gained some health");
+items[1] = new ItemAction("Elixir of Cirno", "Makes you feel stronger.", function (p) { p.attBonus += 5; }, "drank", "became The Strongest");
 items[2] = new ItemArmor("Cat ears", "Cat ears", "Make you feel warmer^Wcuter. Saves you from enemies, too.", S_HEAD, 5);
 items[3] = new ItemArmor("McDonalds Bag", "McDonalds Bag", "Yeah, I know you are wearing one already. But you know, one is never enough.", S_HEAD, 2);
 items[4] = new ItemArmor("Aperture Science Long Fall Boots", "AS Long Fall Boots", "Saves you from long distance falls. And from big trolls, too.", S_LEGS, 3);
@@ -71,11 +78,9 @@ items[5] = new ItemWeapon("Showel", "Showel", "Can be used to kill enemies. And 
 
 function init() {
 	if (browserCheck()) {
-		if (!window.localStorage.rows) window.localStorage.rows = 10;
-		document.getElementById('gamelog').rows = window.localStorage.rows;
-		document.getElementById('gamelog').value = "";
-		canvas = document.getElementById('game');
-		ctx = canvas.getContext('2d');
+		if (!window.localStorage.rows) window.localStorage.rows = 5;
+		document.getElementById('gamelog').style.height = window.localStorage.rows+"em";
+		ctx = document.getElementById('game').getContext('2d');
 		ctx.font = "16px sans-serif";
 		ctx.fillText("Please wait while all the necessary crap is loading...", 100, 210);
 		

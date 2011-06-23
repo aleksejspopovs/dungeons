@@ -8,16 +8,16 @@ function gameOverKeyHandler(e) {
 }
 
 function log(str) {
-	document.getElementById('gamelog').value += "\n"+str;
-	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight; 
+	document.getElementById('gamelog').innerHTML += "<br />"+str;
+	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight;
 }
 function logDec() {
-	document.getElementById("gamelog").rows--;
-	window.localStorage.rows = document.getElementById("gamelog").rows;
+	window.localStorage.rows--;
+	document.getElementById("gamelog").style.height = window.localStorage.rows+"em";
 }
 function logInc() {
-	document.getElementById("gamelog").rows++;
-	window.localStorage.rows = document.getElementById("gamelog").rows;
+	window.localStorage.rows--;
+	document.getElementById("gamelog").style.height = window.localStorage.rows+"em";
 }
 
 function toggleBgm() {
@@ -68,10 +68,7 @@ function randH(a,b) {
 }
 
 function randHalf() {
-	var x = Math.random();
-	while (x > 0.5)
-		x = Math.random();
-	return x;
+	return Math.random()/2;
 }
 
 function checkCoords(x, y) {

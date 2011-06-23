@@ -29,12 +29,20 @@ input {
 	font-size: 10px;
 	border: none;
 }
-#gamelog {
+.gamelog {
 	border: none;
 	width: 822px;
+	height: 5em;
 	font-size: 12pt;
 	font-family: '04b03r';
+	color: gray;
 	margin-left: 0px;
+	overflow-y: scroll;
+	overflow-x: auto;
+}
+.gamelog > b {
+	color: black;
+	font-weight: normal;
 }
 #overlay {
 	font-family: '04b03r';
@@ -64,7 +72,7 @@ input {
 	<span id="overlayContent">ovCont</span>
 </div>
 <input type='button' value='wtf is this?' onClick='openOverlay("About this game", "This is a canvas-based dungeon-crawling roguelike, being developed by a lazy guy known as mariofag in his spare time. Arts are drawn by artists from Russian imageboards (click \"arts info\" for more info on that). The game is deeply in development, so most of the functions are probably missing or broken.<br />You can move by pressing arrow keys, holding Shift makes you turn on spot, pressing Enter allows you to skip a turn. You can destroy walls by pressing d or build new walls by pressing s. You can access your inventory by pressing i.<br />You can get in touch with me (mariofag) in jabber chatroom erpoge@conference.jabber.ru or in following threads:<ul><li><a href=\"http://410chan.ru/dev/res/3218.html\">410chan</a> (mainly for technical info)</li><li><a href=\"http://dobrochan.ru/cr/res/12955.xhtml\">Dobrochan</a> (mainly for arts)</ul>")' /> <input type='button' value='arts info' onClick='openOverlay("Arts", generateArtsInfo());' /> <input id="bgmButton" type="button" value="music: off" onClick="toggleBgm();" /> <input type='button' value='+' onClick='logInc();' /> <input type='button' value='-' onClick='logDec();' /><br />
-<textarea readonly="readonly" id="gamelog" rows="10"></textarea><br />
+<div class="gamelog" id="gamelog"></div><br />
 Host kindly provided by <a href="http://shell.tor.hu">shell.tor.hu</a>, great web host with shell access, real hardware and low prices. More info at <a href="http://cp.tor.hu">cp.tor.hu</a>.
 </body>
 </html>

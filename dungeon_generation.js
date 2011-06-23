@@ -66,20 +66,6 @@ function Dungeon(level) {
 			, 0, 4, 1, 50, 1, 50, false);
 			dun[w.x][w.y].tile = T_FLOOR;
 			dun[w.x][w.y].pass = true;
-			if (Math.random() <= 0.02) {
-				switch (rand(0, 2)) {
-					case 0: // monster
-						dun[w.x][w.y].monster = monsters.length;
-						monsters[monsters.length] = new Monster(monsters.length, rand(0, monsterTypes.length-1), level, w.x, w.y, D_DOWN);
-					break;
-					case 1: // item
-						dun[w.x][w.y].item = rand(0, items.length-1);
-					break;
-					case 2: // gold
-						dun[w.x][w.y].gold = rand(level*4, level*10);
-					break;
-				}
-			}
 		}
 	}	
 	
@@ -114,12 +100,14 @@ function Dungeon(level) {
 	
 	monsters = new Array();
 	
+	// connecting rooms
 	for (var i = 4; i >= 0; i--) {
 		for (var j = Math.pow(2, i); j <= Math.pow(2, i+1)-1; j += 2) 
-			connect(this, tree[j], tree[j+1]); // connecting everything (and also placing a few monsters & items)
+			connect(this, tree[j], tree[j+1]);
 	}
 	
-	var playerCell = rand(16, 31); // placing player
+	// placing the player
+	var playerCell = rand(16, 31);
 	player.x = Math.floor((tree[playerCell].startX + tree[playerCell].endX) / 2);
 	player.y = Math.floor((tree[playerCell].startY + tree[playerCell].endY) / 2);
 	for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) {
@@ -128,13 +116,8 @@ function Dungeon(level) {
 		}
 	}
 
-	for (var i = rand(16,18); i <= 31; i += rand(1,3)) { // placing monsters
-		if (i != playerCell) {
-			this[Math.floor((tree[i].startX + tree[i].endX)/2)][Math.floor((tree[i].startY + tree[i].endY)/2)].monster = monsters.length;
-			monsters[monsters.length] = new Monster(monsters.length, rand(0, monsterTypes.length-1), rand(level == 1 ? 1 : level - 1, level + 1), Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2), 3);
-		}
-	}
-	do { // placing exit 
+	// placing exit
+	do {
 		i = rand(16, 31); 
 	} while (i == playerCell);
 	w = new Walker(this, Math.floor((tree[i].startX + tree[i].endX)/2), Math.floor((tree[i].startY + tree[i].endY)/2));
@@ -142,6 +125,34 @@ function Dungeon(level) {
 		w.moveTo(rand(1, 4), 0, 4, 1, 50, 1, 50, false);
 	}
 	this[w.x][w.y].tile = T_EXIT;
+
+	// placing stuff like monsters, items & gold
+	for (i = 16; i <= 31; i++) {
+		stuff = rand(-1, 3);
+		for (j = 1; j <= stuff; j++) {
+			do {
+				x = rand(tree[i].startX, tree[i].endX);
+				y = rand(tree[i].startY, tree[i].endY);
+			} while (!this[x][y].pass || (this[x][y].monster != -1) || (this[x][y].item != -1) || (this[x][y].gold));
+			switch (rand(0, 4)) {
+				case 0: // monster
+				case 1:
+					this[x][y].monster = monsters.length;
+					monsters[monsters.length] = new Monster(monsters.length, rand(0, monsterTypes.length-1), level, x, y, D_DOWN);
+				break;
+				case 2: // item
+				case 3:
+					this[x][y].item = rand(0, items.length-1);
+				break;
+				case 4: // gold
+					this[x][y].gold = rand(level*4, level*10);
+				break;
+			}			
+		}
+	}
+
+
+	// converting some walls to wall corners
 	for (i=1; i<=50; i++) {
 		for (j=1; j<=50; j++) {
 			if (this[i][j].tile == T_WALL && (this[i][j+1] == undefined || this[i][j+1].tile != T_WALL)) {

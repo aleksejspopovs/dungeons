@@ -66,9 +66,10 @@ function Monster(id, type, lvl, mX, mY, dir) {
 		}
 	}
 	this.dead = function () {
+		this.hp = 0;
 		dungeon[this.x][this.y].monster = -1;
-		if ((this.lvl - player.lvl) > 0) {
-			player.xp += randH(2, 4) * (this.lvl - player.lvl);
+		if (this.lvl >= player.lvl) {
+			player.xp += Math.round(randH(2, 5) * (this.lvl - player.lvl + 1));
 		} else {
 			player.xp += Math.ceil(0.5 * (player.lvl - this.lvl + 1));
 		}
@@ -151,7 +152,7 @@ function Player(name, image, x, y, dir) {
 	}
 	this.dead = function () { // tells player he's dead and finishes the game
 		this.hp = 0;
-		log("You're dead, GAME OVER.");
+		log("You're dead, <b>GAME OVER</b>.");
 		gameOver(false);
 	}
 	this.addHp = function (n) { // adds n HP to the player
@@ -161,7 +162,7 @@ function Player(name, image, x, y, dir) {
 	}
 	this.levelUp = function () { // levels up the player
 		player.lvl++;
-		log(player.name+" has leveled up! His level is now "+player.lvl+".");
+		log("<b>"+player.name+"</b> has <b>leveled up</b>! His level is now <b>"+player.lvl+"</b>.");
 		player.toNextLvl += Math.round((player.lvl+3)*(player.lvl+2) / 2);
 		player.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
 		player.attack = Math.round(player.attack * (1 + randHalf()));
@@ -201,10 +202,15 @@ function Coords(x, y, dir) {
 	this.y = y;
 	this.dir = dir;
 }
-function ItemAction(name, desc, use) {
+function ItemAction(name, desc, applyProps, actionName, outcomeText) {
 	this.name = name;
 	this.desc = desc;
-	this.use = use; // is a function that should be passed a Player object
+	this.actionName = actionName;
+	this.outcomeText = outcomeText;
+	this.use = function (p) {
+		applyProps(p); // is a function that should be passed a Player object
+		log("<b>"+p.name+"</b> "+this.actionName+" <b>"+this.name+"</b> and <b>"+this.outcomeText+"</b>.");
+	}
 	this.stackable = true;
 }
 function ItemArmor(name, shName, desc, slot, bonus) {
