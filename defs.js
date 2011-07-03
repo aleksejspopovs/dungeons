@@ -84,22 +84,14 @@ function init() {
 		ctx.font = "16px sans-serif";
 		ctx.fillText("Please wait while all the necessary crap is loading...", 100, 210);
 		
-		mapTiles[MT_FLOOR] = ctx.createImageData(3,3); // floor
-		for (var i = 0; i <= 35; i++) mapTiles[MT_FLOOR].data[i] = 255;
-		mapTiles[MT_WALL] = ctx.createImageData(3,3); // wall
-		for (var i = 0; i <= 35; i++) mapTiles[MT_WALL].data[i] = !((i+1) % 4) ? 255 : 0;
-		mapTiles[MT_UNDEF] = ctx.createImageData(3,3); // undefined
-		for (var i = 0; i <= 35; i++) mapTiles[MT_UNDEF].data[i] = (i+1)%4 ? 228 : 255;
-		mapTiles[MT_PLAYER] = ctx.createImageData(3,3); // player
-		for (var i = 0; i <= 35; i++) mapTiles[MT_PLAYER].data[i] = i % 2 ? 255 : 0;
-		mapTiles[MT_MONSTER] = ctx.createImageData(3,3); // monster
-		for (var i = 0; i <= 35; i++) mapTiles[MT_MONSTER].data[i] = !(i % 4) || !((i+1) % 4) ? 255 : 0;		
-		mapTiles[MT_EXIT] = ctx.createImageData(3,3); // exit
-		for (var i = 0; i <= 35; i++) mapTiles[MT_EXIT].data[i] = (i % 4 == 0) ? 0 : (i % 4 == 1) ? 127 : 255;		
-		mapTiles[MT_GOLD] = ctx.createImageData(3,3);
-		for (var i = 0; i <= 35; i++) mapTiles[MT_GOLD].data[i] = (i % 4 == 0 || i % 4 == 3) ? 255 : (i % 4 == 1) ? 215 : 0;
-		mapTiles[MT_ITEM] = ctx.createImageData(3,3);
-		for (var i = 0; i <= 35; i++) mapTiles[MT_ITEM].data[i] = (i % 2 == 0) ? 0 : (i % 4 == 1) ? 112 : 255;		
+		mapTiles[MT_FLOOR] = "rgb(255,255,255)";
+		mapTiles[MT_WALL] = "rgb(0,0,0)";
+		mapTiles[MT_UNDEF] = "rgb(228,228,228)";
+		mapTiles[MT_PLAYER] = "rgb(0,255,0)";
+		mapTiles[MT_MONSTER] = "rgb(255,0,0)";
+		mapTiles[MT_EXIT] = "rgb(0,127,255)";
+		mapTiles[MT_GOLD] = "rgb(255,215,0)";
+		mapTiles[MT_ITEM] = "rgb(0,112,0)";
 		
 		testAnimation1 = new Image();
 		testAnimation1.src = './images/HEX_1.png';

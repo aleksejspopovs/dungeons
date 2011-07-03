@@ -89,14 +89,12 @@ function drawSidebar() {
 	// minimap
 	for (i = 1; i <= 50; i++) {
 		for (j = 1; j <= 50; j++) {
-			ctx.putImageData(
-				mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster != -1 ? MT_MONSTER : dungeon[i][j].item != -1 ? MT_ITEM : dungeon[i][j].gold != 0 ? MT_GOLD : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF],
-				672+((i-1)*3),
-				330+((j-1)*3)
-			);
+			ctx.fillStyle = mapTiles[dungeon[i][j].known ? (dungeon[i][j].tile == T_EXIT ? MT_EXIT : dungeon[i][j].monster != -1 ? MT_MONSTER : dungeon[i][j].item != -1 ? MT_ITEM : dungeon[i][j].gold != 0 ? MT_GOLD : (dungeon[i][j].pass ? MT_FLOOR : MT_WALL)) : MT_UNDEF];
+			ctx.fillRect(672+((i-1)*3), 330+((j-1)*3), 3, 3);
 		}
 	}
-	ctx.putImageData(mapTiles[MT_PLAYER], 672+((player.x-1)*3), 330+((player.y-1)*3));
+	ctx.fillStyle = mapTiles[MT_PLAYER];
+	ctx.fillRect(672+((player.x-1)*3), 330+((player.y-1)*3), 3, 3);
 }
 function drawMap() {
 	var startX, startY;
