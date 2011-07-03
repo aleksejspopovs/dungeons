@@ -35,7 +35,6 @@ const A_DIG = 2;
 const A_STAY = 3;
 const A_BUILD = 4;
 const A_INVENTORY = 5;
-const A_TEST = 6;
 
 const S_HEAD = 1; // slots
 const S_LEGS = 2;

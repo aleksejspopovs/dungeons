@@ -65,53 +65,48 @@ function turn(event) {
 	var action;
 	var dontRedraw = false;
 	switch (event.keyCode) {
-		case 0x25:
+		case 37:
 			if (!event.shiftKey) action = A_MOVE;
 			player.dir = D_LEFT;
 			event.preventDefault();
 			nX--;
 		break;
-		case 0x26:
+		case 38:
 			if (!event.shiftKey) action = A_MOVE;
 			player.dir = D_UP;
 			event.preventDefault();
 			nY--;
 		break;
-		case 0x27:
+		case 39:
 			if (!event.shiftKey) action = A_MOVE;
 			player.dir = D_RIGHT;
 			event.preventDefault();
 			nX++;
 		break;
-		case 0x28:
+		case 40:
 			if (!event.shiftKey) action = A_MOVE;
 			player.dir = D_DOWN;
 			event.preventDefault();
 			nY++;
 		break;
-		case 0x44: // d for Dig
-		case 0x64:
+		case 68: // d for Dig
 			action = A_DIG;
 			event.preventDefault();
 		break;
-		case 0x53: // s for build
-		case 0x73:
+		case 83: // s for build
 			action = A_BUILD;
 			event.preventDefault();
 		break;
-		case 0x49: // i for Inventory
-		case 0x69:
+		case 73: // i for Inventory
 			action = A_INVENTORY;
 			event.preventDefault();
 		break;
-		case 0x5A: // z for.. well, whatever
-		case 0x7A:
-			action = A_TEST;
-			event.preventDefault();
-		break;
-		case 0x0D:
+		case 13:
 			action = A_STAY;
 			event.preventDefault();
+		break;
+		default:
+			dontRedraw = true;
 		break;
 	}
 
@@ -145,8 +140,9 @@ function turn(event) {
 					}
 				}
 				monstersTakeTurns();
-			} else if (dungeon[nX][nY].tile == T_EXIT) {
-				levelExit(true);
+			} else {
+				if (dungeon[nX][nY].tile == T_EXIT)
+					levelExit(true);
 				dontRedraw = true;
 			}
 		break;
@@ -190,10 +186,6 @@ function turn(event) {
 			drawInventory();
 			dontRedraw = true;
 		break;
-		case A_TEST:
-			drawTestAnimation(1);
-			dontRedraw = true;
-		break;
 	}
 	if (!dontRedraw) {
 		drawMap();
@@ -203,23 +195,23 @@ function turn(event) {
 
 function inventoryKeyHandler(e) {
 	switch (e.keyCode) {
-		case 0x26:
+		case 38:
 			if (choice > 0) choice--;
 			if (choice < pageStart) pageStart--;
 			e.preventDefault();
 			drawInventory();
 		break;
-		case 0x28:
+		case 40:
 			if (choice < player.inventory.length-1) choice++;
 			if (choice > (pageStart + ITEMS_PER_PAGE - 1)) pageStart++;
 			e.preventDefault();
 			drawInventory();
 		break;
-		case 0x1B:  // ESC
+		case 27:  // ESC
 			setKeyListener(turn);
 			drawMap();
 		break;
-		case 0x0D: // enter
+		case 13: // enter
 			var fail = false;
 			if (items[player.inventory[choice].itemId].__proto__.constructor.name == "ItemAction") { // item is an action item
 				items[player.inventory[choice].itemId].use(player);
@@ -247,8 +239,7 @@ function inventoryKeyHandler(e) {
 			drawInventory();
 			drawSidebar();
 		break;
-		case 0x44: // d for drop
-		case 0x64:
+		case 68: // d for drop
 			if ((items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") && (player.хуйня[items[player.inventory[choice].itemId].slot] !== undefined)  && (player.хуйня[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId)) {
 				log("You <b>can't drop</b> something you're wearing.");
 			} else if (!(dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].pass) || dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].gold || (dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].item != -1)) {
@@ -264,20 +255,20 @@ function inventoryKeyHandler(e) {
 }
 function levelExitKeyHandler(e) {
 	switch (e.keyCode) {
-		case 0x26:
+		case 38:
 			if (choice > 1) choice--;
 			e.preventDefault();
 		break;
-		case 0x28:
+		case 40:
 			if (choice < 3) choice++;
 			e.preventDefault();
 		break;
-		case 0x1B:  // ESC
+		case 27:  // ESC
 			setKeyListener(turn);
 			drawMap();
 			drawSidebar();
 		break;
-		case 0x0D:
+		case 13:
 			switch (choice) {
 				case 1:
 					setKeyListener(turn);
@@ -294,5 +285,9 @@ function levelExitKeyHandler(e) {
 			}
 		break;
 	}
-	if (e.keyCode != 0x0D && e.keyCode != 0x1B) levelExit(false);
+	if (e.keyCode != 13 && e.keyCode != 27) levelExit(false);
+}
+
+function gameOverKeyHandler(e) {
+	if (e.keyCode == 78) newGame(1);
 }

@@ -3,10 +3,6 @@
 // free software is our future
 
 
-function gameOverKeyHandler(e) {
-	if (e.keyCode == 1090 || e.keyCode == 110 || e.keyCode == 78) newGame(1);
-}
-
 function log(str) {
 	document.getElementById('gamelog').innerHTML += "<br />"+str;
 	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight;
@@ -109,10 +105,7 @@ function browserCheck() {
 }
 
 function setKeyListener(l) {
-	if (navigator.appName == "Opera")
-		document.onkeypress = l;
-	else 
-		document.onkeydown = l;
+	document.onkeydown = l;
 }
 
 function itemRecordCompare(a, b) {

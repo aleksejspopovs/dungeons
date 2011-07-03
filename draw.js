@@ -140,7 +140,7 @@ function levelExit(full) {
 	ctx.fillText(">", 652-ctx.measureText("Shop and leave").width-10, 70 + 20*choice);
 }
 
-function drawTestAnimation(frame) {
+/*function drawTestAnimation(frame) {
 	if (frame == 1) 
 		setKeyListener(undefined);
 	
@@ -174,4 +174,4 @@ function drawTestAnimation(frame) {
 		setTimeout(function () { drawMap(); setKeyListener(turn); }, 200);
 	} else
 		setTimeout(function () {drawTestAnimation(++frame)}, 250);
-}
+}*/
