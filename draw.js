@@ -109,10 +109,10 @@ function drawMap() {
 			if (dungeon[i][j].gold != 0)
 				ctx.drawImage(tTerrains[T_GOLD], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 			if (dungeon[i][j].monster != -1)
-				ctx.drawImage(tMonsters[monsters[dungeon[i][j].monster].type][monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
+				ctx.drawImage(monsters[dungeon[i][j].monster].tile[monsters[dungeon[i][j].monster].dir], (i-startX)*TILESIZE, (j-startY)*TILESIZE);
 		}
 	}
-	ctx.drawImage(tPlayer[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);
+	ctx.drawImage(player.tile[player.dir], (player.x - startX)*TILESIZE, (player.y - startY)*TILESIZE);
 }
 
 function levelExit(full) {
@@ -140,38 +140,34 @@ function levelExit(full) {
 	ctx.fillText(">", 652-ctx.measureText("Shop and leave").width-10, 70 + 20*choice);
 }
 
-/*function drawTestAnimation(frame) {
-	if (frame == 1) 
+function drawAnimation(which, from, at, frame, onFinish) {
+	if (frame == 1)
 		setKeyListener(undefined);
 	
 	drawMap();
-	tile = ((frame % 2) == 1) ? testAnimation1 : testAnimation2;
-	x = player.x - Math.max(1, Math.min(51-G_WIDTH, player.x-10));
-	y = player.y - Math.max(1, Math.min(51-G_HEIGHT, player.y-7));
-	switch (player.dir) {
-		case D_UP:
-			y -= frame;
-		break;
-		case D_DOWN:
-			y += frame;
-		break;
-		case D_LEFT:
-			x -= frame;
-		break;
-		case D_RIGHT:
-			x += frame;
+	stop = false;
+	delay = 0;
+	switch (which) {
+		case AN_ATTACK:
+			startX = Math.max(1, Math.min(51-G_WIDTH, player.x-10));
+			startY = Math.max(1, Math.min(51-G_HEIGHT, player.y-7));
+			
+			// removing the actor
+			ctx.drawImage(tTerrains[dungeon[from.x][from.y].tile], (from.x - startX)*TILESIZE, (from.y - startY)*TILESIZE);
+
+			if (frame <= 16)
+				ctx.drawImage(from.tile[from.dir], (from.x - startX)*TILESIZE+xOff[from.dir]*(frame), (from.y - startY)*TILESIZE+yOff[from.dir]*(frame));
+			else
+				ctx.drawImage(from.tile[from.dir], (from.x - startX)*TILESIZE+xOff[from.dir]*(32 - frame), (from.y - startY)*TILESIZE+yOff[from.dir]*(32 - frame));
+			if (from.dir == D_DOWN)
+				ctx.drawImage(at.tile[at.dir], (at.x - startX)*TILESIZE, (at.y - startY)*TILESIZE);
+			stop = (frame == 32);
+			delay = 10;
 		break;
 	}
-	if ((x >= G_WIDTH) || (y >= G_HEIGHT) || (x < 0) || (y < 0)) {
-		setKeyListener(turn);
-		return;
-	}
-	x *= TILESIZE;
-	y *= TILESIZE;
-	ctx.drawImage(tile, x, y);
-	
-	if (frame == 5)	{
-		setTimeout(function () { drawMap(); setKeyListener(turn); }, 200);
-	} else
-		setTimeout(function () {drawTestAnimation(++frame)}, 250);
-}*/
+
+	if (stop)
+		setTimeout(function () { onFinish(); drawMap(); setKeyListener(turn); }, delay);
+	else
+		setTimeout(function () { drawAnimation(which, from, at, ++frame, onFinish); }, delay);
+}

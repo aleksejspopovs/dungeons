@@ -4,28 +4,19 @@
 
 var dungeon, temp, bgm;
 var loaded = 0;
-var toLoad = 10;
 var intervalId = 0;
 var errorCount = 0;
 var choice = 1, pageStart = 0; // for menus
 
-player = new Player("Anonymous", "bag", 25, 25, 3);
+player = new Player("Anonymous", undefined, 25, 25, 3);
 monsters = new Array();
 mapTiles = new Array();
 tPlayer = new Array();
 tTerrains = new Array();
 
 
-function resLoad() {
-	loaded++;
-	if (loaded >= toLoad) {
-		document.getElementById("gamelog").innerHTML = "All the stuff succesfully loaded.";
-		setTimeout(function () {newGame(1); }, 125);
-	}
-}
-
 function newGame(level) {
-	if (level == 1) player = new Player("Anonymous", "bag", 25, 25, 4);
+	if (level == 1) player = new Player("Anonymous", tPlayer, 25, 25, 4);
 	monsters = new Array();
 	dungeon = new Dungeon(level);
 	temp = 1;
@@ -35,12 +26,9 @@ function newGame(level) {
 	log("<b>"+player.name+"</b> has entered the dungeon's <b>"+getFloorString(level)+" floor</b>.");
 }
 
-function attack(att, def) {
-	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
-	def.dir = ((att.dir + 2) % 4 == 0) ? 4 : (att.dir + 2) % 4;
+function attackMaths(att, def) {
 	if (Math.random() >= (def.getDef() - att.getAtt())/10) {
 		var damage = Math.round(def.hp*Math.min(1, (-(def.getDef() - att.getAtt() - 10))/20));
-		//Math.round(def.maxHp * ((randH(1, 3) * att.getAtt()) / (10 * att.getAtt())));
 		def.hp -= damage;
 		log("<b>"+att.name+"</b> has attacked <b>"+def.name+"</b> and done <b>"+damage+"</b> points of damage.");
 	} else {
@@ -52,11 +40,19 @@ function attack(att, def) {
 	}
 }
 
-function monstersTakeTurns() {
-	for (var i = 0; i < monsters.length; i++) { // AI players take their turns
-		if (monsters[i].hp > 0 && player.hp > 0)
-			monsters[i].takeTurn(); // if monster is not dead, make him take his turn
-	}
+function attack(att, def) {
+	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
+	def.dir = ((att.dir + 2) % 4 == 0) ? 4 : (att.dir + 2) % 4;
+	drawAnimation(AN_ATTACK, att, def, 1, function () { attackMaths(att, def); if (att == player) monsterTakesTurn(0); else monsterTakesTurn(att.id+1) });
+}
+
+function monsterTakesTurn(which) {
+	if (which >= monsters.length)
+		return;
+	if (monsters[which].hp > 0 && player.hp > 0)
+		monsters[which].takeTurn(); // if monster is not dead, make him take his turn
+	else
+		monsterTakesTurn(which+1);
 }
 
 function turn(event) {
@@ -138,8 +134,8 @@ function turn(event) {
 							for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
 						}
 					}
+					monsterTakesTurn(0);
 				}
-				monstersTakeTurns();
 			} else {
 				if (dungeon[nX][nY].tile == T_EXIT)
 					levelExit(true);
@@ -156,7 +152,7 @@ function turn(event) {
 							dungeon[i][j].tile = T_WALLC;
 					}
 				}
-				monstersTakeTurns();
+				monsterTakesTurn(0);
 			}
 		break;
 		case A_BUILD:
@@ -171,13 +167,13 @@ function turn(event) {
 							dungeon[i][j].tile = T_WALL;
 					}
 				}
-				monstersTakeTurns();
+				monsterTakesTurn(0);
 			}
 		break;
 		case A_STAY:
 			player.hp += rand(0,2);
 			if (player.hp > player.maxHp) player.hp = player.maxHp;
-			monstersTakeTurns();
+			monsterTakesTurn(0);
 		break;
 		case A_INVENTORY:
 			choice = 0;
@@ -235,7 +231,7 @@ function inventoryKeyHandler(e) {
 			}
 			
 			if (!fail)
-				monstersTakeTurns();
+				monsterTakesTurn(0);
 			drawInventory();
 			drawSidebar();
 		break;
@@ -249,7 +245,7 @@ function inventoryKeyHandler(e) {
 				player.deleteItem(choice);
 				drawMap();
 				setKeyListener(turn);
-			}			
+			}           
 		break;
 	}
 }
@@ -291,3 +287,4 @@ function levelExitKeyHandler(e) {
 function gameOverKeyHandler(e) {
 	if (e.keyCode == 78) newGame(1);
 }
+

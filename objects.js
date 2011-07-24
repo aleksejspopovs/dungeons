@@ -20,6 +20,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 	this.maxHp = monsterTypes[type].hp;
 	this.attack = monsterTypes[type].att;
 	this.defence = monsterTypes[type].def;
+	this.tile = monsterTypes[type].tile;
 	for (var i = 2; i <= lvl; i++) {
 		this.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
 		this.attack = Math.round(player.attack * (1 + randHalf()));
@@ -62,6 +63,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 				this.dir = step.dir;
 				dungeon[this.x][this.y].monster = this.id;
 			} // else monster can't do anything (so he doesn't do anything)
+			monsterTakesTurn(this.id+1);
 		}
 	}
 	this.dead = function () {
@@ -110,14 +112,15 @@ function Monster(id, type, lvl, mX, mY, dir) {
 		return false;
 	}
 }
-function MonsterType(tile, name, desc, artist, hp, att, def) {
-	this.tile = tile;
+function MonsterType(filename, name, desc, artist, hp, att, def) {
+	this.filename = filename;
 	this.name = name;
 	this.desc = desc;
 	this.artist = artist;
 	this.hp = hp;
 	this.att = att;
 	this.def = def;
+	this.tile = new Array();
 }
 function ItemRecord(itemId, inventoryId, count) {
 	if (count == undefined)
@@ -127,9 +130,8 @@ function ItemRecord(itemId, inventoryId, count) {
 	this.count = count;
 }
 
-function Player(name, image, x, y, dir) {
+function Player(name, tile, x, y, dir) {
 	this.name = name;
-	this.image = image;
 	this.x = x;
 	this.y = y;
 	this.dir = dir;
@@ -143,6 +145,7 @@ function Player(name, image, x, y, dir) {
 	this.attBonus = 0;
 	this.defBonus = 0;
 	this.gold = 0;
+	this.tile = tile;
 	this.getAtt = function () {
 		return this.attack + this.attBonus;
 	}

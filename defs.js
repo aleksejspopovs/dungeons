@@ -3,18 +3,22 @@
 // free software is our future
 
 /* CONST */
+// geometry
 const LEVELMOD = 6;
 const TILESIZE = 32;
 const G_WIDTH = 21;
 const G_HEIGHT = 15;
 const LEVELSIZE = 50;
+const ITEMS_PER_PAGE = 15;
 
-const D_UP = 1; // tile directions
+// directions
+const D_UP = 1;
 const D_DOWN = 3;
 const D_RIGHT = 2;
 const D_LEFT = 4;
 
-const MT_FLOOR = 1; // minimap tile IDs
+// minimap tiles
+const MT_FLOOR = 1;
 const MT_WALL = 2;
 const MT_UNDEF = 3;
 const MT_PLAYER = 4;
@@ -23,28 +27,34 @@ const MT_EXIT = 6;
 const MT_GOLD = 7;
 const MT_ITEM = 8;
 
-const T_FLOOR = 1; // tiles
+// tiles
+const T_FLOOR = 1;
 const T_WALL = 2;
 const T_EXIT = 3;
 const T_WALLC = 4;
 const T_GOLD = 5;
 const T_ITEM = 6;
 
-const A_MOVE = 1; // actions
+// actions
+const A_MOVE = 1;
 const A_DIG = 2;
 const A_STAY = 3;
 const A_BUILD = 4;
 const A_INVENTORY = 5;
 
-const S_HEAD = 1; // slots
+// slots
+const S_HEAD = 1;
 const S_LEGS = 2;
 const S_ARMS = 3;
 const S_BODY = 4;
 const S_HANDS = 5;
 const slotNames = new Array("", "head", "legs", "arms", "body", "hands");
 
-const ITEMS_PER_PAGE = 15;
+// animations
+const AN_ATTACK = 1;
 
+
+var toLoad = 10;
 const xOff = new Array(0, 0, 1, 0, -1);
 const yOff = new Array(0, -1, 0, 1, 0);
 
@@ -75,6 +85,14 @@ items[4] = new ItemArmor("Aperture Science Long Fall Boots", "AS Long Fall Boots
 items[5] = new ItemWeapon("Showel", "Showel", "Can be used to kill enemies. And to make stupid jokes funny, too.", 2);
 
 
+function resLoad() {
+	loaded++;
+	if (loaded >= toLoad) {
+		document.getElementById("gamelog").innerHTML = "All the stuff succesfully loaded.";
+		setTimeout(function () {newGame(1); }, 125);
+	}
+}
+
 function init() {
 	if (browserCheck()) {
 		if (!window.localStorage.rows) window.localStorage.rows = 5;
@@ -91,11 +109,6 @@ function init() {
 		mapTiles[MT_EXIT] = "rgb(0,127,255)";
 		mapTiles[MT_GOLD] = "rgb(255,215,0)";
 		mapTiles[MT_ITEM] = "rgb(0,112,0)";
-		
-		testAnimation1 = new Image();
-		testAnimation1.src = './images/HEX_1.png';
-		testAnimation2 = new Image();
-		testAnimation2.src = './images/HEX_2.png';
 
 		tTerrains[T_FLOOR] = new Image(); // Floor
 		tTerrains[T_FLOOR].src = './images/floor.png';
@@ -117,33 +130,32 @@ function init() {
 		tTerrains[T_ITEM].onload = resLoad;
 		
 		tPlayer[D_UP] = new Image(); // Player facing up
-		tPlayer[D_UP].src = './images/'+player.image+'/up.png';
+		tPlayer[D_UP].src = './images/bag/up.png';
 		tPlayer[D_UP].onload = resLoad;
 		tPlayer[D_RIGHT] = new Image(); // Player facing right
-		tPlayer[D_RIGHT].src = './images/'+player.image+'/right.png';
+		tPlayer[D_RIGHT].src = './images/bag/right.png';
 		tPlayer[D_RIGHT].onload = resLoad;
 		tPlayer[D_DOWN] = new Image(); // Player facing down
-		tPlayer[D_DOWN].src = './images/'+player.image+'/down.png';
+		tPlayer[D_DOWN].src = './images/bag/down.png';
 		tPlayer[D_DOWN].onload = resLoad;
 		tPlayer[D_LEFT] = new Image(); // Player facing left
-		tPlayer[D_LEFT].src = './images/'+player.image+'/left.png';
+		tPlayer[D_LEFT].src = './images/bag/left.png';
 		tPlayer[D_LEFT].onload = resLoad;
 		
-		tMonsters = new Array();
 		for (var i = 0; i < monsterTypes.length; i++) {
-			tMonsters[i] = new Array();
-			tMonsters[i][D_UP] = new Image();
-			tMonsters[i][D_UP].src = './images/monsters/'+monsterTypes[i].tile+'_up.png'; 
-			tMonsters[i][D_UP].onload = resLoad;
-			tMonsters[i][D_RIGHT] = new Image();
-			tMonsters[i][D_RIGHT].src = './images/monsters/'+monsterTypes[i].tile+'_right.png';
-			tMonsters[i][D_RIGHT].onload = resLoad;
-			tMonsters[i][D_DOWN] = new Image();
-			tMonsters[i][D_DOWN].src = './images/monsters/'+monsterTypes[i].tile+'_down.png';
-			tMonsters[i][D_DOWN].onload = resLoad;
-			tMonsters[i][D_LEFT] = new Image();
-			tMonsters[i][D_LEFT].src = './images/monsters/'+monsterTypes[i].tile+'_left.png';
-			tMonsters[i][D_LEFT].onload = resLoad;
+			monsterTypes[i].tile = new Array();
+			monsterTypes[i].tile[D_UP] = new Image();
+			monsterTypes[i].tile[D_UP].src = './images/monsters/'+monsterTypes[i].filename+'_up.png'; 
+			monsterTypes[i].tile[D_UP].onload = resLoad;
+			monsterTypes[i].tile[D_RIGHT] = new Image();
+			monsterTypes[i].tile[D_RIGHT].src = './images/monsters/'+monsterTypes[i].filename+'_right.png';
+			monsterTypes[i].tile[D_RIGHT].onload = resLoad;
+			monsterTypes[i].tile[D_DOWN] = new Image();
+			monsterTypes[i].tile[D_DOWN].src = './images/monsters/'+monsterTypes[i].filename+'_down.png';
+			monsterTypes[i].tile[D_DOWN].onload = resLoad;
+			monsterTypes[i].tile[D_LEFT] = new Image();
+			monsterTypes[i].tile[D_LEFT].src = './images/monsters/'+monsterTypes[i].filename+'_left.png';
+			monsterTypes[i].tile[D_LEFT].onload = resLoad;
 			toLoad += 4;
 		}
 		
