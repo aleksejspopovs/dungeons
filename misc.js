@@ -37,7 +37,7 @@ function fillScreenPart() {
 
 function gameOver(c) {
 	if (!c) {
-		setKeyListener(null);
+		setKeyListener(undefined);
 		intervalId = setInterval(fillScreenPart, 25);
 	} else {
 		ctx.fillStyle = 'white';
