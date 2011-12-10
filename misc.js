@@ -4,21 +4,23 @@
 
 
 function log(str) {
-	document.getElementById('gamelog').innerHTML += "<br />"+str;
+	document.getElementById('gamelog').innerHTML += "<br />" + str;
 	document.getElementById('gamelog').scrollTop = document.getElementById('gamelog').scrollHeight;
 }
+
 function logDec() {
 	window.localStorage.rows--;
-	document.getElementById("gamelog").style.height = window.localStorage.rows+"em";
+	document.getElementById("gamelog").style.height = window.localStorage.rows + "em";
 }
+
 function logInc() {
-	window.localStorage.rows--;
-	document.getElementById("gamelog").style.height = window.localStorage.rows+"em";
+	window.localStorage.rows++;
+	document.getElementById("gamelog").style.height = window.localStorage.rows + "em";
 }
 
 function toggleBgm() {
 	window.localStorage.bgm = window.localStorage.bgm == "on" ? "off" : "on";
-	document.getElementById("bgmButton").value = "music: "+window.localStorage.bgm;
+	document.getElementById("bgmButton").value = "music: " + window.localStorage.bgm;
 	if (window.localStorage.bgm == "on")
 		bgm.play();
 	else
@@ -27,7 +29,7 @@ function toggleBgm() {
 
 function fillScreenPart() {
 	ctx.fillStyle = 'black';
-	ctx.fillRect(0, 0, 672, 5*temp);
+	ctx.fillRect(0, 0, 672, 5 * temp);
 	temp++;
 	if (temp > 96) {
 		clearInterval(intervalId);
@@ -35,36 +37,13 @@ function fillScreenPart() {
 	}
 }
 
-function gameOver(c) {
-	if (!c) {
-		setKeyListener(undefined);
-		intervalId = setInterval(fillScreenPart, 25);
-	} else {
-		ctx.fillStyle = 'white';
-		ctx.textAlign = "center";
-		ctx.font = "54pt '04b03r'";
-		ctx.fillText("GAME OVER", 336, 80);
-		ctx.font = "12pt '04b03r'";
-		ctx.fillText("Insert coin(s) or press n to start a new game", 336, 100);
-		setKeyListener(gameOverKeyHandler);
-	}
-}
-
-function rand(a,b) {
+function rand(a, b) {
 	if (a > b) {
-		x = a;
+		var x = a;
 		a = b;
 		b = a;
 	}
-	return Math.round(Math.random()*(b-a))+parseInt(a);
-}
-
-function randH(a,b) {
-	return rand(a,b) + (Math.random() >= 0.5 ? 0.5 : 0);
-}
-
-function randHalf() {
-	return Math.random()/2;
+	return Math.round(Math.random()*(b - a))+parseInt(a);
 }
 
 function checkCoords(x, y) {
@@ -82,9 +61,9 @@ function openOverlay(title, content) {
 }
 
 function generateArtsInfo() {
-	out = "<table>";
+	var out = "<table>";
 	for (var i = 1; i < monsterTypes.length; i++) {
-		out += "<tr><td><img src='./images/monsters/"+monsterTypes[i].tile+"_down.png' /></td><td><b>"+monsterTypes[i].name+"</b><br /><i>"+monsterTypes[i].desc+"</i><br />Drawn by "+monsterTypes[i].artist+".<br /></td></tr>";
+		out += "<tr><td><img src='"+monsterTypes[i].tile[D_DOWN].src+"' /></td><td><b>"+monsterTypes[i].name+"</b><br /><i>"+monsterTypes[i].desc+"</i><br />Drawn by "+monsterTypes[i].artist+".<br /></td></tr>";
 	}
 	out += "<tr><td colspan='2' style='font-weight: bold;	font-size: 12pt;'>Fonts</td></tr>";
 	out += "<tr><td style='font-family: Visitor; font-size: 16pt'>Abc<br />123</td><td>Visitor font<br />Free for personal use.<br /><i>Made by AEnigma (Brian Kent).</td>";
@@ -92,12 +71,32 @@ function generateArtsInfo() {
 	out += "<tr><td colspan='2' style='font-weight: bold;	font-size: 12pt;'>Music</td></tr>";
 	out += "<tr><td><img src='./images/music.png'></td><td>Another corridor<br /><i>Made by Anonymous musician from Dobrochan #1.</td>";
 	out += "<tr><td><img src='./images/music.png'></td><td>Winged tune<br /><i>Made by Anonymous musician from Dobrochan #2.</td>";
-	
+
 	return out+"</table>";
 }
 
 function getFloorString(floor) {
-	return Math.round((floor % 100)/10) == 1 ? (floor+"th") : (floor % 10 == 1 ? (floor+"st") : (floor % 10 == 2 ? (floor+"nd") : (floor % 10 == 3 ? (floor+"rd") : (floor+"th"))));
+	//return Math.round((floor % 100)/10) == 1 ? (floor+"th") : (floor % 10 == 1 ? (floor+"st") : (floor % 10 == 2 ? (floor+"nd") : (floor % 10 == 3 ? (floor+"rd") : (floor+"th"))));
+	// saved to keep me ashamed of what I've done
+	// this is amost as bad as that RFC email validating regexp
+	if (Math.round(floor % 100 / 10) == 1) {
+		return floor + "th";
+	} else {
+		switch (floor % 10) {
+			case 1:
+				return floor + "st";
+			break;
+			case 2:
+				return floor + "nd";
+			break;
+			case 3:
+				return floor + "rd";
+			break;
+			default:
+				return floor + "th";
+			break;
+		}
+	}
 }
 
 function browserCheck() {
@@ -109,5 +108,5 @@ function setKeyListener(l) {
 }
 
 function itemRecordCompare(a, b) {
-	return ((a.itemId == undefined) || (items[a.itemId].name > items[b.itemId].name));
+	return ((a.itemId === undefined) || (items[a.itemId].name > items[b.itemId].name));
 }

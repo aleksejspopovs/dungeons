@@ -2,26 +2,14 @@
 // this software is available under MIT License, see LICENSE for more info
 // free software is our future
 
-var dungeon, temp, bgm;
-var loaded = 0;
-var intervalId = 0;
-var errorCount = 0;
-var choice = 1, pageStart = 0; // for menus
-
-player = new Player("Anonymous", undefined, 25, 25, 3);
-monsters = new Array();
-mapTiles = new Array();
-tPlayer = new Array();
-tTerrains = new Array();
-
-
 function newGame(level) {
 	if (level == 1) player = new Player("Anonymous", tPlayer, 25, 25, 4);
 	monsters = new Array();
 	dungeon = new Dungeon(level);
+	makeKnown();
 	temp = 1;
 	drawSidebar();
-	drawMap(); 
+	drawMap();
 	setKeyListener(turn);
 	log("<b>"+player.name+"</b> has entered the dungeon's <b>"+getFloorString(level)+" floor</b>.");
 }
@@ -41,7 +29,7 @@ function attackMaths(att, def) {
 }
 
 function attack(att, def) {
-	att.dir = att.x == def.x ? (att.y == def.y+1 ? 1 : 3) : att.x == def.x+1 ? 4 : 2;
+	att.dir = att.x == def.x ? (att.y == def.y + 1 ? 1 : 3) : att.x == def.x + 1 ? 4 : 2;
 	def.dir = ((att.dir + 2) % 4 == 0) ? 4 : (att.dir + 2) % 4;
 	drawAnimation(AN_ATTACK, att, def, 1, function () { attackMaths(att, def); if (att == player) monsterTakesTurn(0); else monsterTakesTurn(att.id+1) });
 }
@@ -52,7 +40,7 @@ function monsterTakesTurn(which) {
 	if (monsters[which].hp > 0 && player.hp > 0)
 		monsters[which].takeTurn(); // if monster is not dead, make him take his turn
 	else
-		monsterTakesTurn(which+1);
+		monsterTakesTurn(which+  1);
 }
 
 function turn(event) {
@@ -114,26 +102,18 @@ function turn(event) {
 				} else {
 					if (dungeon[nX][nY].item != -1) {
 						player.giveItem(dungeon[nX][nY].item);
-						log("<b>"+player.name+"</b> has picked up <b>"+items[dungeon[nX][nY].item].name+"</b> and put it into his backpack.");
+						log("<b>" + player.name + "</b> has picked up <b>" + items[dungeon[nX][nY].item].name + "</b> and put it into his backpack.");
 						dungeon[nX][nY].item = -1;
 					}
 					if (dungeon[nX][nY].gold != 0) {
 						player.gold += dungeon[nX][nY].gold;
-						log("<b>"+player.name+"</b> has picked up <b>"+dungeon[nX][nY].gold+"</b> gold coins and put them into his pocket.");
+						log("<b>" + player.name + "</b> has picked up <b>" + dungeon[nX][nY].gold + "</b> gold coins and put them into his pocket.");
 						dungeon[nX][nY].gold = 0;
 					}
 					player.x = nX;
 					player.y = nY;
-		 
-					if (player.dir == D_LEFT || player.dir == D_RIGHT) {
-						if ((player.x + (player.dir == D_LEFT ? -10 : 10) <= 50) && (player.x + (player.dir == D_LEFT ? -10 : 10) >= 1)) {
-							for (var i = (player.y-7 < 1 ? 1 : player.y-7); i <= (player.y+7 > 50 ? 50 : player.y+7); i++) dungeon[player.x + (player.dir == 4 ? -10 : 10)][i].known = true;
-						}
-					} else {
-						if ((player.y + (player.dir == D_UP ? -7 : 7) <= 50) && (player.y + (player.dir == D_UP ? -7 : 7) >= 1)) {
-							for (var i = (player.x-10 < 1 ? 1 : player.x-10); i <= (player.x+10 > 50 ? 50 : player.x+10); i++) dungeon[i][player.y + (player.dir == 1 ? -7 : 7)].known = true;
-						}
-					}
+
+					makeKnown();
 					monsterTakesTurn(0);
 				}
 			} else {
@@ -148,7 +128,7 @@ function turn(event) {
 				dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile = T_FLOOR;
 				for (var i = ((player.x < 3) ? 1 : (player.x - 2)); i <= ((player.x > 48) ? 50 : (player.x + 2)); i++) {
 					for (var j = ((player.y < 3) ? 1 : (player.y - 2)); j <= ((player.y > 48) ? 50 : (player.y + 2)); j++) {
-						if (dungeon[i][j].tile == T_WALL && (dungeon[i][j+1] == undefined || (dungeon[i][j+1].tile != T_WALL && dungeon[i][j+1].tile != T_WALLC))) 
+						if (dungeon[i][j].tile == T_WALL && (dungeon[i][j+1] === undefined || (dungeon[i][j+1].tile != T_WALL && dungeon[i][j+1].tile != T_WALLC)))
 							dungeon[i][j].tile = T_WALLC;
 					}
 				}
@@ -161,7 +141,7 @@ function turn(event) {
 				dungeon[nX+xOff[player.dir]][nY+yOff[player.dir]].tile = T_WALL;
 				for (var i = ((player.x < 3) ? 1 : (player.x - 2)); i <= ((player.x > 48) ? 50 : (player.x + 2)); i++) {
 					for (var j = ((player.y < 3) ? 1 : (player.y - 2)); j <= ((player.y > 48) ? 50 : (player.y + 2)); j++) {
-						if (dungeon[i][j].tile == T_WALL && (dungeon[i][j+1] == undefined || (dungeon[i][j+1].tile != T_WALL && dungeon[i][j+1].tile != T_WALLC))) 
+						if (dungeon[i][j].tile == T_WALL && (dungeon[i][j+1] === undefined || (dungeon[i][j+1].tile != T_WALL && dungeon[i][j+1].tile != T_WALLC)))
 							dungeon[i][j].tile = T_WALLC;
 						if (dungeon[i][j].tile == 4 && dungeon[i][j+1] != undefined && (dungeon[i][j+1].tile == T_WALL || dungeon[i][j+1].tile == T_WALLC))
 							dungeon[i][j].tile = T_WALL;
@@ -216,27 +196,27 @@ function inventoryKeyHandler(e) {
 				if (player.inventory.length == choice)
 					choice--;
 			} else {                                                                                 // item is a wearable item
-				if (player.хуйня[items[player.inventory[choice].itemId].slot] != undefined) {
-					if (player.хуйня[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId) {
-						player.хуйня[items[player.inventory[choice].itemId].slot] = undefined;
+				if (player.equipment[items[player.inventory[choice].itemId].slot] != undefined) {
+					if (player.equipment[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId) {
+						player.equipment[items[player.inventory[choice].itemId].slot] = undefined;
 						items[player.inventory[choice].itemId].unWear(player);
-					} else { 
+					} else {
 						fail = true;
 						log("You <b>can't equip</b> this item because you're already wearing something on your <b>"+slotNames[items[player.inventory[choice].itemId].slot]+".");
 					}
 				} else {
-					player.хуйня[items[player.inventory[choice].itemId].slot] = player.inventory[choice]; // ItemRecord for the equipped item
+					player.equipment[items[player.inventory[choice].itemId].slot] = player.inventory[choice]; // ItemRecord for the equipped item
 					items[player.inventory[choice].itemId].wear(player);
 				}
 			}
-			
+
 			if (!fail)
 				monsterTakesTurn(0);
 			drawInventory();
 			drawSidebar();
 		break;
 		case 68: // d for drop
-			if ((items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") && (player.хуйня[items[player.inventory[choice].itemId].slot] !== undefined)  && (player.хуйня[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId)) {
+			if ((items[player.inventory[choice].itemId].__proto__.constructor.name != "ItemAction") && (player.equipment[items[player.inventory[choice].itemId].slot] !== undefined)  && (player.equipment[items[player.inventory[choice].itemId].slot].inventoryId == player.inventory[choice].inventoryId)) {
 				log("You <b>can't drop</b> something you're wearing.");
 			} else if (!(dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].pass) || dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].gold || (dungeon[player.x+xOff[player.dir]][player.y+yOff[player.dir]].item != -1)) {
 				log("You <b>can't drop</b> items on walls and floor tiles that already have items or coins on them.");
@@ -245,7 +225,7 @@ function inventoryKeyHandler(e) {
 				player.deleteItem(choice);
 				drawMap();
 				setKeyListener(turn);
-			}           
+			}
 		break;
 	}
 }
@@ -284,7 +264,23 @@ function levelExitKeyHandler(e) {
 	if (e.keyCode != 13 && e.keyCode != 27) levelExit(false);
 }
 
+function gameOver(c) {
+	if (!c) {
+		setKeyListener(undefined);
+		intervalId = setInterval(fillScreenPart, 25);
+	} else {
+		ctx.fillStyle = 'white';
+		ctx.textAlign = "center";
+		ctx.font = "54pt '04b03r'";
+		ctx.fillText("GAME OVER", 336, 80);
+		ctx.font = "12pt '04b03r'";
+		ctx.fillText("Insert coin(s) or press n to start a new game", 336, 100);
+		setKeyListener(gameOverKeyHandler);
+	}
+}
+
 function gameOverKeyHandler(e) {
-	if (e.keyCode == 78) newGame(1);
+	if (e.keyCode == 78)
+		newGame(1);
 }
 

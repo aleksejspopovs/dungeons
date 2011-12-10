@@ -12,22 +12,21 @@ function DungeonTile(tile, passable) {
 }
 function Monster(id, type, lvl, mX, mY, dir) {
 	this.id = id;
-	this.type = type;
 	this.lvl = lvl;
 	this.x = mX;
 	this.y = mY;
 	this.dir = dir;
-	this.maxHp = monsterTypes[type].hp;
-	this.attack = monsterTypes[type].att;
-	this.defence = monsterTypes[type].def;
-	this.tile = monsterTypes[type].tile;
+	this.maxHp = type.hp;
+	this.attack = type.att;
+	this.defence = type.def;
+	this.tile = type.tile;
 	for (var i = 2; i <= lvl; i++) {
 		this.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
-		this.attack = Math.round(player.attack * (1 + randHalf()));
-		this.defence = Math.round(player.defence * (1 + randHalf()));    
+		this.attack = Math.round(player.attack * (1 + rand(0, 1) / 2));
+		this.defence = Math.round(player.defence * (1 + rand(0, 1) / 2));
 	}
 	this.hp = this.maxHp;
-	this.name = monsterTypes[type].name;
+	this.name = type.name;
 	this.getAtt = function () {
 		return this.attack;
 	}
@@ -70,7 +69,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 		this.hp = 0;
 		dungeon[this.x][this.y].monster = -1;
 		if (this.lvl >= player.lvl) {
-			player.xp += Math.round(randH(2, 5) * (this.lvl - player.lvl + 1));
+			player.xp += Math.round((rand(2, 5) + rand(0, 1) / 2) * (this.lvl - player.lvl + 1));
 		} else {
 			player.xp += Math.ceil(0.5 * (player.lvl - this.lvl + 1));
 		}
@@ -95,10 +94,10 @@ function Monster(id, type, lvl, mX, mY, dir) {
 			for (i = 1; i <= 4; i++) {
 				mvX = curX + xOff[i];
 				mvY = curY + yOff[i];
-				if (checkCoords(mvX, mvY) && 
-					(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) && 
+				if (checkCoords(mvX, mvY) &&
+					(cost[mvX][mvY] > cost[curX][curY]+1) && (dungeon[mvX][mvY].pass) &&
 					(dungeon[mvX][mvY].monster == -1 || (mvX == this.x && mvY == this.y)) // this.x;this.y is a monster obviously, so we should check for that
-				) { 
+				) {
 					cost[mvX][mvY] = cost[curX][curY]+1;
 					queue[w] = new Coords(mvX, mvY, 0);
 					w++;
@@ -112,6 +111,7 @@ function Monster(id, type, lvl, mX, mY, dir) {
 		return false;
 	}
 }
+
 function MonsterType(filename, name, desc, artist, hp, att, def) {
 	this.filename = filename;
 	this.name = name;
@@ -122,6 +122,7 @@ function MonsterType(filename, name, desc, artist, hp, att, def) {
 	this.def = def;
 	this.tile = new Array();
 }
+
 function ItemRecord(itemId, inventoryId, count) {
 	if (count == undefined)
 		count = 1;
@@ -164,11 +165,13 @@ function Player(name, tile, x, y, dir) {
 	}
 	this.levelUp = function () { // levels up the player
 		player.lvl++;
-		log("<b>"+player.name+"</b> has <b>leveled up</b>! His level is now <b>"+player.lvl+"</b>.");
+		log("<b>"+player.name+"</b> has <b>leveled up</b>! His level is now <b>" + player.lvl + "</b>.");
 		player.toNextLvl += Math.round((player.lvl+3)*(player.lvl+2) / 2);
-		player.maxHp += (((player.lvl+1)*player.lvl)/2) * 3;
-		player.attack = Math.round(player.attack * (1 + randHalf()));
-		player.defence = Math.round(player.defence * (1 + randHalf()));
+		var nexMaxHp = player.maHp + (((player.lvl+1)*player.lvl)/2) * 3;
+		player.hp = Math.round(player.hp / player.maxHp * newMaxHp);
+		player.maxHp = newMaxHp;
+		player.attack = Math.round(player.attack * (1 + rand(0, 1) / 2));
+		player.defence = Math.round(player.defence * (1 + rand(0, 1) / 2));
 	}
 	this.inventory = new Array();
 	this.lastInventoryId = 0;
@@ -195,7 +198,7 @@ function Player(name, tile, x, y, dir) {
 			this.inventory.splice(item, 1);
 		}
 	}
-	this.хуйня = new Array(); // sorry, couldn't find another way to call all the stuff that player's wearing
+	this.equipment = new Array();
 }
 function Coords(x, y, dir) {
 	this.x = x;
