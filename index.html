@@ -77,8 +77,5 @@ input {
 </div>
 <input type='button' value='wtf is this?' onClick='openOverlay("About this game", "This is a canvas-based dungeon-crawling roguelike, being developed by a lazy guy known as mariofag in his spare time. Arts are drawn by artists from Russian imageboards (click \"arts info\" for more info on that). The game is deeply in development, so most of the functions are probably missing or broken.<br />You can move by pressing arrow keys, holding Shift makes you turn on spot, pressing Enter allows you to skip a turn. You can destroy walls by pressing d or build new walls by pressing s. You can access your inventory by pressing i.<br />You can get in touch with me (mariofag) in jabber chatroom erpoge@conference.jabber.ru or in following threads:<ul><li><a href=\"http://410chan.ru/dev/res/3218.html\">410chan</a> (mainly for technical info)</li><li><a href=\"http://dobrochan.ru/cr/res/12955.xhtml\">Dobrochan</a> (mainly for arts)</ul>")' /> <input type='button' value='arts info' onClick='openOverlay("Arts", generateArtsInfo());' /> <input id="bgmButton" type="button" value="music: off" onClick="toggleBgm();" /> <input type='button' value='+' onClick='logInc();' /> <input type='button' value='-' onClick='logDec();' /><br />
 <div class="gamelog" id="gamelog"></div><br />
-<?php
-include("footer.php");
-?>
 </body>
 </html>
