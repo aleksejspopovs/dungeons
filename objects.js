@@ -167,7 +167,7 @@ function Player(name, tile, x, y, dir) {
 		player.lvl++;
 		log("<b>"+player.name+"</b> has <b>leveled up</b>! His level is now <b>" + player.lvl + "</b>.");
 		player.toNextLvl += Math.round((player.lvl+3)*(player.lvl+2) / 2);
-		var nexMaxHp = player.maHp + (((player.lvl+1)*player.lvl)/2) * 3;
+		var newMaxHp = player.maxHp + (((player.lvl+1)*player.lvl)/2) * 3;
 		player.hp = Math.round(player.hp / player.maxHp * newMaxHp);
 		player.maxHp = newMaxHp;
 		player.attack = Math.round(player.attack * (1 + rand(0, 1) / 2));
